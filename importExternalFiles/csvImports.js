@@ -10,7 +10,10 @@ const csvFilePath=path.join(baseDir,'importExternalFiles','csv','iApply.csv');
 
 let array=[]
 try {
-    array=await csv().fromFile(csvFilePath)
+    array=await csv({
+      delimiter:',"€$)*!",'
+    }).fromFile(csvFilePath)
+    cleanArray(array)
     await performTransaction(array)
 } catch (error) {
     
@@ -20,6 +23,25 @@ try {
 
 
 
+}
+let unacceptableFinCenters=['BLBRO', 'WEBAPPL', 'FC000']
+function cleanArray(array){
+  array.forEach(element => {
+    element.amount=element.amount.replace(',','')
+    element.amount=element.amount.replace(',','')
+    element.amount=element.amount.replace(',','')
+    element.clientEGFN=element.clientEGFN.trim()
+    
+    if (element.clientEGFN.length>10){
+      element.clientEGFN=element.clientEGFN.slice(element.clientEGFN.length-10)
+    }
+    unacceptableFinCenters.forEach((center)=>{
+      element.refferingFinCenter=element.refferingFinCenter.replace(center,'')
+      if (isNaN(element.refferingFinCenter)){
+        element.refferingFinCenter=''
+      }
+    })
+  });
 }
 async function performTransaction(newData) {
     const session = await mongoose.startSession();
