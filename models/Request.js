@@ -1,4 +1,5 @@
 const { Schema, model,Types } = require("mongoose");
+const { checkIapplyId, checkEGN, checkFinCen } = require("./validators/requestValidators");
 
 //let arrayOfSubjects=['Чисто УВТ след ипотека','Вписване в ЦРОЗ','Удостоверение по ч. 87']
 
@@ -19,18 +20,23 @@ const requestSchema=new Schema({
     statusSender:{type:String,required:true},
     history:{type:[],default:[]},
     description:{type:String, minLength:15},
-    finCenter:{type:Number,required:true,min:1,max:999},
-    refferingFinCenter:{type:Number,min:1,max:999},
+    finCenter:{type:Number,required:true,validate:{
+        validator:checkFinCen,
+        message:(props)=>{return `${props.value} is not a valid Branch Number` }
+    }},
+    refferingFinCenter:{type:Number,validate:{
+        validator:checkFinCen,
+        message:(props)=>{return `${props.value} is not a valid Branch Number` }
+    }},
     iApplyId:{type:String,required:true,validate:{
-        validator:async (value)=>{
-            const regex=/^[A-Z]{2}[0-9]+$/
-            return regex.test(value)
-
-        },
+        validator:checkIapplyId,
         message:(props)=>{return `${props.value} is not a valid I-applyId` }
     }},
     clientName:{type:String,required:true},
-    clientEGFN:{type:String,required:true,minLength:9,maxLength:10},
+    clientEGFN:{type:String,required:true,validate:{
+        validator:checkEGN,
+        message:(props)=>{return `${props.value} is not a valid Bulstat/EGN` }
+    }},
     product:{type:String,required:true},
     amount:{type:Number, min:1000},
     ccy:{type:String, enum:['BGN', 'EUR','USD','Other']},

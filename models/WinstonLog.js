@@ -7,23 +7,13 @@ const winstonLogSchema = new mongoose.Schema({
   level: String,
   meta:Object,
   
-  method: {
-    type: String,
-  },
-  url: {
-    type: String,
-  },
-  ip: {
-    type: String,
-  },
-  headers: {
-    type: Object, // Assuming headers will be stored as an object
-  },
-  query: {
-    type: Object, // Assuming query parameters will be stored as an object
-  },
+  method: String,
+  url: String,
+  ip: String,
+  headers: Object,
+  query: Object,
   body:Object, // Assuming request body will be stored as an object
-  
+  reasons:Object
   
 
   // ... other fields
