@@ -38,11 +38,10 @@ async function start(){
         console.error(error.message);
         process.exit(1)
     }
-    cron.schedule('55 00 * * *', async () => {
+    cron.schedule('12 21 * * *', async () => {
         console.log('Running replaceIapplyTable() function...');
         try {
           await replaceIapplyTable();
-          console.log('IApply table replaced successfully!');
         } catch (error) {
           console.log(error.message);
         }
@@ -103,6 +102,8 @@ async function start(){
     } else {
         let a=await WinstonLog.find({});
         console.log()
+        //await WinstonLog.deleteMany({})
+        //console.log()
     }
 
 }
