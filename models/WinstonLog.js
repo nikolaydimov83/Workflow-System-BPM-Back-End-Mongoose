@@ -12,7 +12,7 @@ const winstonLogSchema = new mongoose.Schema({
   ip: String,
   headers: Object,
   query: Object,
-  body:Object, // Assuming request body will be stored as an object
+  body:{}, // Assuming request body will be stored as an object
   reasons:Object
   
 

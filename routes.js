@@ -7,6 +7,7 @@ const createController = require("./controllers/createController");
 const dataController = require("./controllers/dataController");
 const editController = require("./controllers/editController");
 const iApplyConroller = require("./controllers/iapplyDataController");
+const loggerController = require("./controllers/loggerControler");
 const reportsContoller = require("./controllers/reportsController");
 const searchController = require("./controllers/searchController");
 const unknownController = require("./controllers/unknownController");
@@ -25,6 +26,7 @@ module.exports=(app)=>{
     app.use('/changeIApply',changeIapplyController);
     app.use('/admin',adminUsersRightsControler);
     app.use('/workflow',workflowController);
+    app.use('/wrongDataLogger',loggerController)
     app.use('*',unknownController);
     
 

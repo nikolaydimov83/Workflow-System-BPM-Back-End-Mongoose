@@ -5,6 +5,8 @@ const mongoose=require('mongoose');
 const { baseDir } = require('../constants');
 const logger = require('../logger/logger');
 const { checkIapplyId, checkEGN, checkFinCen } = require('../models/validators/requestValidators');
+const LastIssueLog = require('../models/LastIssueLog');
+const { timeStamp } = require('console');
 async function replaceIapplyTable(){
 
 const csvFilePath=path.join(baseDir,'importExternalFiles','csv','iApply.csv');
@@ -49,7 +51,8 @@ async function checkArrayElementData(element){
       ip: 'N/A',
       headers: {},
       query: {},
-      body: element,
+      body: {...element},
+      newBody:element,
       reasons:{isIApplyIdCorrect, isEGNCorrect, isFinCentCorrect, isRefFinCentCorrect}
     });
 
@@ -89,6 +92,13 @@ async function performTransaction(newData) {
     try {
       await IApply.deleteMany({}, { session });
       await IApply.insertMany(newData, { session });
+      let lastTimeStamp=await LastIssueLog.find({})
+      if (!lastTimeStamp[0]){
+        LastIssueLog.create({timestamp:new Date()})
+      }else{
+        lastTimeStamp[0].timestamp=new Date()
+        lastTimeStamp[0].save()
+      }
       await session.commitTransaction();
       console.log('I-apply transfer successfull!')
     } catch (error) {
