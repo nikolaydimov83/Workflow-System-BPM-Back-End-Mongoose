@@ -1,5 +1,5 @@
 const IApply = require('../models/IApply');
-const { readIapplyData } = require('../services/iapplyServices');
+const { readIapplyData, changeIapplyDataByIApplyId } = require('../services/iapplyServices');
 const { parseError } = require('../utils/utils');
 
 const iApplyConroller=require('express').Router();
@@ -17,6 +17,21 @@ iApplyConroller.get('/:id',async (req,res)=>{
         }
         res.status(201);
         res.json({iApplyData});
+    } catch (error) {
+        res.status(400);
+        res.json({message:parseError(error)});
+    }
+    
+
+})
+
+iApplyConroller.put('/:id',async (req,res)=>{
+    try {
+        let iApplyId=req.params.id
+        let iApplyData=await changeIapplyDataByIApplyId(iApplyId,req.body)
+    
+        res.status(201);
+        res.json(iApplyData);
     } catch (error) {
         res.status(400);
         res.json({message:parseError(error)});
