@@ -8,6 +8,29 @@ async function createUser(user){
     return result
 }
 
+async function createUsers(userList){
+const result=[]
+for (const key in userList) {
+    const user = userList[key];
+    try {
+        await createUser(user)
+        user.status='Created'
+        user.message='Success!'
+        result.push(user)         
+    } catch (error) {
+        user.status='Not Created'
+        user.message=error.message
+        result.push(user)
+        
+    } finally{
+        continue
+    }
+
+
+    }
+    return result
+}
+
 async function getAllActiveDirUsers(){
     let result = await UserActiveDir.find({});
     return result
@@ -48,5 +71,6 @@ module.exports={getAllActiveDirUsers,
                 getActiveDirUserByID,
                 editUserById,
                 createUser,
+                createUsers,
                 editAllUsersWithRole
             }

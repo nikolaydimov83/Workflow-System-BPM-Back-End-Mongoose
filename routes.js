@@ -6,12 +6,14 @@ const commentsController = require("./controllers/commentsController");
 const createController = require("./controllers/createController");
 const dataController = require("./controllers/dataController");
 const editController = require("./controllers/editController");
+const fileUploadsController = require("./controllers/fileUploadsController");
 const iApplyConroller = require("./controllers/iapplyDataController");
 const loggerController = require("./controllers/loggerControler");
 const reportsContoller = require("./controllers/reportsController");
 const searchController = require("./controllers/searchController");
 const unknownController = require("./controllers/unknownController");
 const workflowController = require("./controllers/workflowController");
+
 
 module.exports=(app)=>{
     app.use('/users',authController);
@@ -27,6 +29,7 @@ module.exports=(app)=>{
     app.use('/admin',adminUsersRightsControler);
     app.use('/workflow',workflowController);
     app.use('/wrongDataLogger',loggerController)
+    app.use('/files', fileUploadsController);
     app.use('*',unknownController);
     
 

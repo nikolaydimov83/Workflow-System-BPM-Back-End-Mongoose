@@ -6,7 +6,7 @@ const { baseDir } = require('../constants');
 const logger = require('../logger/logger');
 const { checkIapplyId, checkEGN, checkFinCen } = require('../models/validators/requestValidators');
 const LastIssueLog = require('../models/LastIssueLog');
-const { timeStamp } = require('console');
+
 async function replaceIapplyTable(){
 
 const csvFilePath=path.join(baseDir,'importExternalFiles','csv','iApply.csv');
