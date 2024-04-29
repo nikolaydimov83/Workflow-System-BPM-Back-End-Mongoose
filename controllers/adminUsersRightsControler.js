@@ -1,6 +1,5 @@
 const UserActiveDir = require('../models/UserActiveDir');
 const { getAllActiveDirUsers, getActiveDirUserByID, editUserById, createUser } = require('../services/adminServices');
-const { getAllRoles } = require('../services/workflowServices');
 const { parseError } = require('../utils/utils');
 
 

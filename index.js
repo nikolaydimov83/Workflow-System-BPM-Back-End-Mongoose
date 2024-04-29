@@ -18,6 +18,7 @@ const WinstonLog = require('./models/WinstonLog');
 const { filePathKey, filePathCert, CONNECTION_STRING, PORT, IP_ADDRESS } = require('./constants');
 const { getAllIApplyDataWrong } = require('./services/logServices');
 const LastIssueLog = require('./models/LastIssueLog');
+const { uploadUsersFromCSVFile } = require('./importExternalFiles/userActiveDirImports');
 
 
 const credentials = {
@@ -40,7 +41,7 @@ async function start(){
         console.error(error.message);
         process.exit(1)
     }
-    cron.schedule('25 22 * * *', async () => {
+    cron.schedule('56 11 * * *', async () => {
         console.log('Running replaceIapplyTable() function...');
         try {
           await replaceIapplyTable();
@@ -102,6 +103,7 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     } else {
+        //await uploadUsersFromCSVFile()
         //let a=await getAllIApplyDataWrong()
         //console.log(a[0]._doc.meta.body)
         //await WinstonLog.deleteMany({})
