@@ -28,8 +28,35 @@ for (const key in userList) {
 
 
     }
+    if (result.length===0){
+        console.log()
+    }
     return result
 }
+
+async function editUsers(userList){
+    const result=[]
+    for (const key in userList) {
+        const user = userList[key];
+        try {
+            const id=UserActiveDir.find({email:user.email})
+            await editUserById(id)
+            user.status='Edited'
+            user.message='Success!'
+            result.push(user)         
+        } catch (error) {
+            user.status='Not Created'
+            user.message=error.message
+            result.push(user)
+            
+        } finally{
+            continue
+        }
+    
+    
+        }
+        return result
+    }
 
 async function getAllActiveDirUsers(){
     let result = await UserActiveDir.find({});

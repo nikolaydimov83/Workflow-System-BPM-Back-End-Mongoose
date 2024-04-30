@@ -41,7 +41,7 @@ async function start(){
         console.error(error.message);
         process.exit(1)
     }
-    cron.schedule('56 11 * * *', async () => {
+    cron.schedule('44 14 * * *', async () => {
         console.log('Running replaceIapplyTable() function...');
         try {
           await replaceIapplyTable();
