@@ -1,13 +1,18 @@
 const nodemailer=require('nodemailer');
 const { IP_ADDRESS, FRONT_END_IP_ADDRESS } = require('../constants');
-const emailAdress='nikolay.dimov83@gmail.com'
+
+const emailAdress = 'planb_application@outlook.com'; // Your Outlook email address
+
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'nikolay.dimov83@gmail.com',
-      pass: 'dxvpsakhmnrjdmzg'
-    }
-  });
+  host: 'smtp.office365.com', // Outlook SMTP server
+  port: 587, // Port for Outlook SMTP
+  secure: false, // TLS required, but not using a secure connection
+  auth: {
+    user: 'planb_application@outlook.com', // Your Outlook email address
+    pass: 'Mw4MDLTgVVbzrdh' // App password generated for Outlook
+  }
+});
+
 
 function serverSendMail(from,to,mailSubject,content){
 const mailOptions={
@@ -40,7 +45,7 @@ function prepareMailContent(request){
     }
 
   return `
-  <div><a href=https://${FRONT_END_IP_ADDRESS}/dashboard/${request._id}>Plan B заявка с id:  <a/>
+  <div><a href=http://${FRONT_END_IP_ADDRESS}/dashboard/${request._id}>Plan B заявка с id:  <a/>
   По апликация ${request.iApplyId} 
   На клиент ${request.clientName}, 
   ЕГФН:${request.clientEGFN} 
