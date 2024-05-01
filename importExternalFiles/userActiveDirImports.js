@@ -2,7 +2,7 @@ const path = require('path');
 const csv=require('csvtojson');
 const { baseDir } = require('../constants');
 const logger = require('../logger/logger');
-const { createUsers } = require('../services/adminServices');
+const { createUsers, editUsers } = require('../services/adminServices');
 
 async function uploadUsersFromCSVFile(){
     const csvFilePath=path.join(baseDir,'importExternalFiles','csv','users.csv');
@@ -35,7 +35,7 @@ async function editUsersFromCSVFile(){
     let array=[]
     try {
         array=await csv().fromFile(csvFilePath)
-        const result=await createUsers(array)
+        const result=await editUsers(array)
         result.forEach((entry)=>{
                 logger.info({
                   message: entry.message,

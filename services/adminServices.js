@@ -39,13 +39,13 @@ async function editUsers(userList){
     for (const key in userList) {
         const user = userList[key];
         try {
-            const id=UserActiveDir.find({email:user.email})
-            await editUserById(id)
+            const oldUser=(await UserActiveDir.find({email:user.email}))[0]
+            await editUserById(oldUser._id,user)
             user.status='Edited'
             user.message='Success!'
             result.push(user)         
         } catch (error) {
-            user.status='Not Created'
+            user.status='Not Edited'
             user.message=error.message
             result.push(user)
             
@@ -99,5 +99,6 @@ module.exports={getAllActiveDirUsers,
                 editUserById,
                 createUser,
                 createUsers,
+                editUsers,
                 editAllUsersWithRole
             }
