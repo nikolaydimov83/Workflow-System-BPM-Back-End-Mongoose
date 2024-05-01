@@ -3,12 +3,16 @@ const { baseDir } = require('../constants');
 const fs=require('fs')
 const { promisify } = require('util');
 const writeFileAsync = promisify(fs.writeFile);
+const deleteFileAsync = promisify(fs.unlink);
 
+async function deleteCSVFile(filePath){
+    deleteFileAsync(filePath);
+}
 async function processExternalCsvFile(filename, proccessingFunction,fileData){
     const csvFilePath=path.join(baseDir,'importExternalFiles','csv',filename);
-    let responseCsvFileProcess
-    processedFileData=extractBodyPart(fileData)
-    await writeFileAsync(csvFilePath, processedFileData)
+    let responseCsvFileProcess;
+    processedFileData=extractBodyPart(fileData);
+    await writeFileAsync(csvFilePath, processedFileData);
         try {
             let result=await proccessingFunction()
             const csvString = arrayToCSV(result)||''
@@ -50,4 +54,4 @@ function arrayToCSV(arr) {
 
 }
 
-module.exports={processExternalCsvFile}
+module.exports={processExternalCsvFile,deleteFileAsync}

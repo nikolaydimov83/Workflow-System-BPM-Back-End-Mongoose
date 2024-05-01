@@ -1,10 +1,9 @@
 const { uploadUsersFromCSVFile, editUsersFromCSVFile } = require('../importExternalFiles/userActiveDirImports');
 const { parseError } = require('../utils/utils');
-const csv = require('csvtojson');
-const fs = require('fs');
+
 const path = require('path');
 const { baseDir } = require('../constants');
-const { processExternalCsvFile } = require('../importExternalFiles/fileUtils');
+const { processExternalCsvFile, deleteFileAsync } = require('../importExternalFiles/fileUtils');
 
 
 const fileUploadsController=require('express').Router();
@@ -52,6 +51,10 @@ fileUploadsController.post('/usersFileEdit',async(req,res)=>{
             const result= await processExternalCsvFile('editUsers.csv',editUsersFromCSVFile,fileData)
             if (!result.message){
                 res.download(result)
+                res.on('finish',async()=>{
+                    deleteFileAsync(result);
+                })
+
             }else{
                 throw result
             }

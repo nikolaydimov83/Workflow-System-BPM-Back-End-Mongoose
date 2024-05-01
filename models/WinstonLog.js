@@ -13,10 +13,12 @@ const winstonLogSchema = new mongoose.Schema({
   headers: Object,
   query: Object,
   body:{}, // Assuming request body will be stored as an object
-  reasons:Object
+  reasons:Object,
+  responseStatus:Number,
+  responseBody:String
   
 
-  // ... other fields
+
 });
 
 // Specify the collection name here
