@@ -34,6 +34,9 @@ async function checkArrayElementData(element){
   let isEGNCorrect=(await checkEGN(element.clientEGFN))
   let isFinCentCorrect=(await checkFinCen(element.finCenter))
   let isRefFinCentCorrect=(await checkFinCen(element.refferingFinCenter))
+  if (!element.iApplyId){
+    console.log(element)
+  }
   if (handledFinCenExceptions.includes(element.refferingFinCenter)){
     isRefFinCentCorrect=true
   }
