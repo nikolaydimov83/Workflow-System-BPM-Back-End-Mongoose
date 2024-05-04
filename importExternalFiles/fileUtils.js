@@ -11,7 +11,8 @@ async function deleteCSVFile(filePath){
 async function processExternalCsvFile(filename, proccessingFunction,fileData){
     const csvFilePath=path.join(baseDir,'importExternalFiles','csv',filename);
     let responseCsvFileProcess;
-    processedFileData=extractBodyPart(fileData);
+    let processedFileData=extractBodyPart(fileData);
+    processedFileData=processedFileData.trim()
     await writeFileAsync(csvFilePath, processedFileData);
         try {
             let result=await proccessingFunction()

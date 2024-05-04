@@ -80,7 +80,7 @@ fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
             fileData += chunk
         });   
         req.on('end', async () => {
-            fileData.trim()
+            fileData=fileData.trim()
             const result= await processExternalCsvFile('iApply.csv',replaceIapplyTable,fileData)
             if (!result.message){
                 res.download(result)
