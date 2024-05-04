@@ -104,7 +104,7 @@ async function performTransaction(newData) {
       await IApply.insertMany(newData, { session });
       let lastTimeStamp=await LastIssueLog.find({})
       if (!lastTimeStamp[0]){
-        LastIssueLog.create({timestamp:new Date()})
+        LastIssueLog.create({timestamp:new Date()});
       }else{
         lastTimeStamp[0].timestamp=new Date()
         lastTimeStamp[0].save()
