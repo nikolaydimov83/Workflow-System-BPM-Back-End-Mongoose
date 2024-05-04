@@ -76,9 +76,7 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
-      await WinstonLogIapplyTransfer.deleteMany({})
-      const allDataWrong= await WinstonLogIapplyTransfer.find({})
-      console.log()
+
     }
 }
 
