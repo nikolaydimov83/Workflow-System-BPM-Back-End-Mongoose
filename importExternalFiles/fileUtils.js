@@ -54,4 +54,14 @@ function arrayToCSV(arr) {
 
 }
 
-module.exports={processExternalCsvFile,deleteFileAsync}
+function checkDelimeter(array, properHeadings){
+    let result=true
+    properHeadings.forEach((heading)=>{
+        if (!(Object.keys(array[0]).includes(heading))){
+            result=false
+        }
+    })
+    return result
+}
+
+module.exports={processExternalCsvFile,deleteFileAsync,checkDelimeter}

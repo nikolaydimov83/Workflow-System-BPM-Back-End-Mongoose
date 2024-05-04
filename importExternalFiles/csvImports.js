@@ -6,27 +6,34 @@ const { baseDir } = require('../constants');
 const logger = require('../logger/logger');
 const { checkIapplyId, checkEGN, checkFinCen } = require('../models/validators/requestValidators');
 const LastIssueLog = require('../models/LastIssueLog');
+const { checkDelimeter } = require('./fileUtils');
+const loggerIapply = require('../logger/iapplyLogger');
 
 async function replaceIapplyTable(){
 
 const csvFilePath=path.join(baseDir,'importExternalFiles','csv','iApply.csv');
-
+const properHeadings=['iApplyId','clientName','clientEGFN','product','amount','ccy','finCenter','refferingFinCenter']
 let array=[]
+let result=[{success:true}]
 try {
     array=await csv({
       delimiter:',"€$)*!",'
     }).fromFile(csvFilePath)
+    if (!checkDelimeter(array,properHeadings)){
+      throw new Error('Wrong delimeter provided!')
+    }
     await cleanArray(array)
     await performTransaction(array)
+    return result
 } catch (error) {
     
-  console.log(error.message);
+  result[0].success=false
+  result[0].message=error.message
+  return result
     
 }
-
-
 }
-let unacceptableFinCenters=['BLBRO', 'WEBAPPL', 'FC000', 'FC099']
+let unacceptableFinCenters=['BLBRO', 'WEBAPPL', 'FC000', 'FC099','BRO']
 let handledFinCenExceptions=["FC099",'BLBRO411','FC000','BLBRO501',"","BLBRO411","WEBAPPL","BRO"]
 let handledEGNExceptionsRegEx=/^10000[0-9]{10}$/
 async function checkArrayElementData(element){
@@ -47,7 +54,7 @@ async function checkArrayElementData(element){
   
 
   if (!isIApplyIdCorrect||!isEGNCorrect||!isFinCentCorrect||!isRefFinCentCorrect){
-    logger.info({
+     loggerIapply.info({
       message: 'Incoming Incorect I-apply Data',
       method: 'POST',
       url: 'N/A',
@@ -90,7 +97,7 @@ async function cleanArray(array){
 
 async function performTransaction(newData) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    session.startTransaction();  
   
     try {
       await IApply.deleteMany({}, { session });
