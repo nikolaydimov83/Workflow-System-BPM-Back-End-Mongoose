@@ -1,10 +1,10 @@
 const LastIssueLog = require("../models/LastIssueLog");
-const WinstonLog = require("../models/WinstonLog");
+const WinstonLogIapplyTransfer = require("../models/WinstonLogIApplyTransfers");
 
 async function getAllIApplyDataWrong(){
     const lastIssueLogDate=new Date((await LastIssueLog.find({}))[0].timestamp)
     lastIssueLogDate.setHours(0,0,0,0)
-    const allDataWrong= await WinstonLog
+    const allDataWrong= await WinstonLogIapplyTransfer
                                 .find({
                                         message:"Incoming Incorect I-apply Data",
                                         timestamp:{$gte:lastIssueLogDate}

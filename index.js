@@ -16,12 +16,28 @@ const logger = require('./logger/logger');
 const { filePathKey, filePathCert, CONNECTION_STRING, PORT, IP_ADDRESS } = require('./constants');
 const logRequest=require('./middlewares/loggerMiddleware');
 const { scheduleUploadIApplyData } = require('./scheduledTasks/shcheduleUploadIapplyData');
+const WinstonLog = require('./models/WinstonLog');
+const loggerIapply = require('./logger/iapplyLogger');
+const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
 
 const credentials = { 
   key: fs.readFileSync(filePathKey),
   cert: fs.readFileSync(filePathCert),
 }
+/*process.on('uncaughtException', async (error) => {
+    
+  console.error('Uncaught Exception:', error);
+  // Optionally perform cleanup tasks
+  // For example: close database connections, release resources, etc.
+  // Exit the process with a non-zero exit code to indicate an error
+  await mongoose.disconnect()
+  console.log('Database connection restarted!')
+  await  mongoose.connect(CONNECTION_STRING,{
+    useUnifiedTopology:true,
+    useNewUrlParser:true
+});
 
+});*/
 start();
 
 async function start(){
@@ -42,6 +58,10 @@ async function start(){
       winstonInstance:logger,
       statusLevels:true
     }));
+    app.use(winstonExpress.logger({
+      winstonInstance:loggerIapply,
+      statusLevels:true
+    }));
     app.use(logRequest());
     app.use(cors(corsOptions));
     app.use(verifyToken());
@@ -55,6 +75,10 @@ async function start(){
       let adminUser = await createUser({ email: 'rkostyaneva@postbank.bg', branchNumber: 101, branchName: 'Admin', userStatus: 'Active', role: adminRole.id });
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
+    }else{
+      await WinstonLogIapplyTransfer.deleteMany({})
+      const allDataWrong= await WinstonLogIapplyTransfer.find({})
+      console.log()
     }
 }
 
