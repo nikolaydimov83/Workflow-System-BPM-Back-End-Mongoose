@@ -9,10 +9,11 @@ async function getAllIApplyDataWrong(){
                                         message:"Incoming Incorect I-apply Data",
                                         timestamp:{$gte:lastIssueLogDate}
                                     })
-    let result=[]
-   allDataWrong.forEach((element)=>{
-    result.push({_id:element._id, body:element._doc.meta.body, reasons:element._doc.meta.reasons,newBody:element._doc.meta.newBody})
-    })
+    let result=allDataWrong.map((element)=>({   _id:element._id, 
+                                                body:element._doc.meta.body, 
+                                                reasons:element._doc.meta.reasons,
+                                                newBody:element._doc.meta.newBody
+                                            }))
     return result
 }
 

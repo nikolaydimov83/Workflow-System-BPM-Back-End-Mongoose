@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const { replaceIapplyTable } = require('../importExternalFiles/csvImports');
 
 function scheduleUploadIApplyData(){
-    cron.schedule('00 10 * * *', async () => {
+    cron.schedule('21 12 * * *', async () => {
         console.log('Running replaceIapplyTable() function...');
         try {
           await replaceIapplyTable();

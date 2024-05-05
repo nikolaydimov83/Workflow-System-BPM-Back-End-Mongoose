@@ -22,8 +22,11 @@ try {
     if (!checkDelimeter(array,properHeadings)){
       throw new Error('Wrong delimeter provided!')
     }
-    await cleanArray(array)
+    let wrongElements=await cleanArray(array)
     await performTransaction(array)
+    wrongElements.forEach((element)=>{
+      loggerIapply.info(element)
+    })
     return result
 } catch (error) {
     
@@ -37,6 +40,7 @@ let unacceptableFinCenters=['BLBRO', 'WEBAPPL', 'FC000', 'FC099','BRO']
 let handledFinCenExceptions=["FC099",'BLBRO411','FC000','BLBRO501',"","BLBRO411","WEBAPPL","BRO"]
 let handledEGNExceptionsRegEx=/^10000[0-9]{10}$/
 async function checkArrayElementData(element){
+ 
   let isIApplyIdCorrect=(await checkIapplyId(element.iApplyId))
   let isEGNCorrect=(await checkEGN(element.clientEGFN))
   let isFinCentCorrect=(await checkFinCen(element.finCenter))
@@ -54,7 +58,7 @@ async function checkArrayElementData(element){
   
 
   if (!isIApplyIdCorrect||!isEGNCorrect||!isFinCentCorrect||!isRefFinCentCorrect){
-     loggerIapply.info({
+     return {
       message: 'Incoming Incorect I-apply Data',
       method: 'POST',
       url: 'N/A',
@@ -64,15 +68,31 @@ async function checkArrayElementData(element){
       body: {...element},
       newBody:element,
       reasons:{isIApplyIdCorrect, isEGNCorrect, isFinCentCorrect, isRefFinCentCorrect}
-    });
+    }
+     
+     /*loggerIapply.info({
+      message: 'Incoming Incorect I-apply Data',
+      method: 'POST',
+      url: 'N/A',
+      ip: 'N/A',
+      headers: {},
+      query: {},
+      body: {...element},
+      newBody:element,
+      reasons:{isIApplyIdCorrect, isEGNCorrect, isFinCentCorrect, isRefFinCentCorrect}
+    });*/
 
   }
 
 }
 async function cleanArray(array){
+  const wrongElements=[]
   for (const key in array) {
       const element = array[key];
-      await checkArrayElementData(element)
+      const wrongElement=await checkArrayElementData(element)
+      if (wrongElement){
+        wrongElements.push(wrongElement)
+      }
       element.amount=element.amount.replace(',','')
       element.amount=element.amount.replace(',','')
       element.amount=element.amount.replace(',','')
@@ -93,6 +113,7 @@ async function cleanArray(array){
         }
       })
     }
+    return wrongElements
   }
 
 async function performTransaction(newData) {
