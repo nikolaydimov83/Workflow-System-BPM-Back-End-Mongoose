@@ -4,12 +4,12 @@ const { IP_ADDRESS, FRONT_END_IP_ADDRESS } = require('../constants');
 const emailAdress = 'planb_application@outlook.com'; // Your Outlook email address
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.office365.com', // Outlook SMTP server
-  port: 587, // Port for Outlook SMTP
-  secure: false, // TLS required, but not using a secure connection
+  host: 'smtp.office365.com', 
+  port: 587, 
+  secure: false, 
   auth: {
-    user: 'planb_application@outlook.com', // Your Outlook email address
-    pass: 'Mw4MDLTgVVbzrdh' // App password generated for Outlook
+    user: 'planb_application@outlook.com', 
+    pass: 'Mw4MDLTgVVbzrdh'
   }
 });
 

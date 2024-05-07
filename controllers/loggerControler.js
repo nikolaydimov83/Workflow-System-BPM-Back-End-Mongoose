@@ -1,21 +1,28 @@
-const UserActiveDir = require('../models/UserActiveDir');
-const { getAllActiveDirUsers, getActiveDirUserByID, editUserById, createUser } = require('../services/adminServices');
 const { getAllIApplyDataWrong } = require('../services/logServices');
-const { getAllRoles } = require('../services/workflowServices');
 const { parseError } = require('../utils/utils');
+
+
+
 
 
 const loggerController=require('express').Router();
 
 loggerController.get('/',async(req,res)=>{
     try {
-        let data=await getAllIApplyDataWrong()
-        res.status(201);
-        res.json(data);
-    } catch (error) {
-        res.status(401);
-        res.json({message:parseError(error)});
-    }
+        page=Number(req.query.page);
+        let data=await getAllIApplyDataWrong();
+            data.sort((a,b)=>a._id-b._id);
+            const result=data.slice((page-1)*10,page*10);
+            res.status(201);
+            res.json({result,searchContextString:'',collectionLength:data.length})
+
+
+        
+
+        } catch (error) {
+            res.status(401);
+            res.json({message:parseError(error)});
+        }
 
 
 });

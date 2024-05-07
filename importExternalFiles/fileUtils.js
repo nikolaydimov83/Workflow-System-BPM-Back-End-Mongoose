@@ -16,11 +16,7 @@ async function processExternalCsvFile(filename, proccessingFunction,fileData){
     await writeFileAsync(csvFilePath, processedFileData);
         try {
             let result=await proccessingFunction()
-            const csvString = arrayToCSV(result)||''
-            const fileName='export'+filename+'_'+(Date.now()).toString()+'.csv'
-            responseCsvFileProcess=path.join(baseDir,'exports',fileName)
-
-            await writeFileAsync(responseCsvFileProcess,csvString)
+            responseCsvFileProcess = await createCSVFileFromArray(result, filename);
             
     
         } catch (error) {
@@ -29,6 +25,14 @@ async function processExternalCsvFile(filename, proccessingFunction,fileData){
        
     
     return responseCsvFileProcess   
+}
+
+async function createCSVFileFromArray(array, filename) {
+    const csvString = arrayToCSV(array) || '';
+    const fileName = 'export' + filename + '_' + (Date.now()).toString() + '.csv';
+    let responseCsvFileProcess = path.join(baseDir, 'exports', fileName);
+    await writeFileAsync(responseCsvFileProcess, csvString);
+    return responseCsvFileProcess;
 }
 
 function extractBodyPart(chunk) {
@@ -65,4 +69,4 @@ function checkDelimeter(array, properHeadings){
     return result
 }
 
-module.exports={processExternalCsvFile,deleteFileAsync,checkDelimeter}
+module.exports={processExternalCsvFile,deleteFileAsync,checkDelimeter,createCSVFileFromArray}
