@@ -109,3 +109,4 @@ static/node_modules/
 *.csv
 *.pem
 *.crt
+*.zip

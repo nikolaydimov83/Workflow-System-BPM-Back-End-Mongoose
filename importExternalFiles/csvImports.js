@@ -6,10 +6,12 @@ const { baseDir } = require('../constants');
 const logger = require('../logger/logger');
 const { checkIapplyId, checkEGN, checkFinCen } = require('../models/validators/requestValidators');
 const LastIssueLog = require('../models/LastIssueLog');
-const { checkDelimeter } = require('./fileUtils');
+const { checkDelimeter, extractZipArchive } = require('./fileUtils');
 const loggerIapply = require('../logger/iapplyLogger');
 
+
 async function replaceIapplyTable(){
+
 
 const csvFilePath=path.join(baseDir,'importExternalFiles','csv','iApply.csv');
 const properHeadings=['iApplyId','clientName','clientEGFN','product','amount','ccy','finCenter','refferingFinCenter']
@@ -70,18 +72,6 @@ async function checkArrayElementData(element){
       reasons:{isIApplyIdCorrect, isEGNCorrect, isFinCentCorrect, isRefFinCentCorrect}
     }
      
-     /*loggerIapply.info({
-      message: 'Incoming Incorect I-apply Data',
-      method: 'POST',
-      url: 'N/A',
-      ip: 'N/A',
-      headers: {},
-      query: {},
-      body: {...element},
-      newBody:element,
-      reasons:{isIApplyIdCorrect, isEGNCorrect, isFinCentCorrect, isRefFinCentCorrect}
-    });*/
-
   }
 
 }
