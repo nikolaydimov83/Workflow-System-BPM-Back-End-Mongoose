@@ -1,20 +1,15 @@
 const { getAllIApplyDataWrong } = require('../services/logServices');
 const { parseError } = require('../utils/utils');
 
-
-
-
-
 const loggerController=require('express').Router();
 
 loggerController.get('/',async(req,res)=>{
     try {
-        page=Number(req.query.page);
-        let data=await getAllIApplyDataWrong();
-            data.sort((a,b)=>a._id-b._id);
-            const result=data.slice((page-1)*10,page*10);
-            res.status(201);
-            res.json({result,searchContextString:'',collectionLength:data.length})
+        const page=Number(req.query.page);
+        const pageSize=500;
+        let data=await getAllIApplyDataWrong(page,pageSize);
+        res.status(201);
+        res.json({result:data.result,searchContextString:'',collectionLength:data.totalCount})
 
 
         

@@ -5,7 +5,7 @@ const path = require('path');
 const { baseDir } = require('../constants');
 
 function scheduleUploadIApplyData(){
-    cron.schedule('07 12 * * *', async () => {
+    cron.schedule('39 15 * * *', async () => {
         console.log('Running replaceIapplyTable() function...');
         try {
           const zipFilePath=path.join(baseDir,'importExternalFiles','csv','PlanB.zip');

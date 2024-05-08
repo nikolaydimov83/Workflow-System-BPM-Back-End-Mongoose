@@ -83,9 +83,9 @@ async function cleanArray(array){
       if (wrongElement){
         wrongElements.push(wrongElement)
       }
-      element.amount=element.amount.replace(',','')
-      element.amount=element.amount.replace(',','')
-      element.amount=element.amount.replace(',','')
+     element.amount=element.amount.replace(',','.')
+      /*element.amount=element.amount.replace(',','')
+      element.amount=element.amount.replace(',','')*/
       element.clientEGFN=element.clientEGFN.trim()
       
       if (element.clientEGFN.length>10){
