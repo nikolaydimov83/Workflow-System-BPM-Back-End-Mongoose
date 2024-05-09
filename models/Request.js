@@ -7,6 +7,9 @@ const requestSchema=new Schema({
     requestWorkflow:{type:Types.ObjectId,ref:'Workflow',required:true},
     deadlineDate:{type:Date, required:true,validate:{
         validator:async (value)=>{
+            if (this.skipDeadlineDateValidation) {
+                return true;
+            }
             let today=new Date()
             today.setHours(0,0,0,0);
             value.setHours(0,0,0,0);

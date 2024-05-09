@@ -99,5 +99,38 @@ fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
     }
 });
 
+function processIncomingCSVFile(req, res, processingFunction,functionOnFinish) {
+    try {
+        if (!req.headers['content-type'].startsWith('text/csv')) {
+            throw new Error('Invalid file format')
+          }
+           
+        let fileData = '';
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+            fileData += chunk
+        });   
+        req.on('end', async () => {
+            fileData=fileData.trim();
+            const result= await processExternalCsvFile('users.csv',processingFunction,fileData)
+            if (!result.message){
+                res.download(result)
+                res.on('finish',async()=>{
+                    if (functionOnFinish){
+                       functionOnFinish(result); 
+                    }
+                    
+                })
+            }else{
+                throw result
+            }
+        });             
+      
+    } catch (error) {
+        res.status(401);
+        res.json({message:parseError(error)});
+    }
+}
+
 
 module.exports=fileUploadsController
