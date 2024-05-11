@@ -11,7 +11,8 @@ const fileUploadsController=require('express').Router();
 
 fileUploadsController.post('/usersFileUpload',async(req,res)=>{
     try {
-        if (!req.headers['content-type'].startsWith('text/csv')) {
+        await processIncomingCSVFile(req,res,'users.csv',uploadUsersFromCSVFile);
+        /*if (!req.headers['content-type'].startsWith('text/csv')) {
             throw new Error('Invalid file format')
           }
            
@@ -27,7 +28,7 @@ fileUploadsController.post('/usersFileUpload',async(req,res)=>{
             }else{
                 throw result
             }
-        });             
+        });*/             
       
     } catch (error) {
         res.status(401);
@@ -39,28 +40,8 @@ fileUploadsController.post('/usersFileUpload',async(req,res)=>{
 
 fileUploadsController.post('/usersFileEdit',async(req,res)=>{
     try {
-        if (!req.headers['content-type'].startsWith('text/csv')) {
-            throw new Error('Invalid file format')
-          }
-           
-        let fileData = '';
-        req.setEncoding('utf8');
-        req.on('data', (chunk) => {
-            fileData += chunk
-        });   
-        req.on('end', async () => {
-            const result= await processExternalCsvFile('editUsers.csv',editUsersFromCSVFile,fileData)
-            if (!result.message){
-                res.download(result)
-                res.on('finish',async()=>{
-                    deleteFileAsync(result);
-                })
-
-            }else{
-                throw result
-            }
-        });             
-      
+        await processIncomingCSVFile(req,res,'editUsers.csv',editUsersFromCSVFile)
+                  
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});
@@ -70,7 +51,8 @@ fileUploadsController.post('/usersFileEdit',async(req,res)=>{
 
 fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
     try {
-        if (!req.headers['content-type'].startsWith('text/csv')) {
+        await processIncomingCSVFile(req,res,'iApply.csv',replaceIapplyTable)
+        /*if (!req.headers['content-type'].startsWith('text/csv')) {
             throw new Error('Invalid file format')
           }
            
@@ -91,7 +73,7 @@ fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
             }else{
                 throw result
             }
-        });             
+        });*/             
       
     } catch (error) {
         res.status(401);
@@ -99,7 +81,7 @@ fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
     }
 });
 
-function processIncomingCSVFile(req, res, processingFunction,functionOnFinish) {
+async function processIncomingCSVFile(req, res, filename,processingFunction,functionOnFinish) {
     try {
         if (!req.headers['content-type'].startsWith('text/csv')) {
             throw new Error('Invalid file format')
@@ -112,7 +94,7 @@ function processIncomingCSVFile(req, res, processingFunction,functionOnFinish) {
         });   
         req.on('end', async () => {
             fileData=fileData.trim();
-            const result= await processExternalCsvFile('users.csv',processingFunction,fileData)
+            const result= await processExternalCsvFile(filename,processingFunction,fileData)
             if (!result.message){
                 res.download(result)
                 res.on('finish',async()=>{
