@@ -35,7 +35,7 @@ async function processExternalCsvFile(filename, proccessingFunction,fileData){
         }
        
     
-    return responseCsvFileProcess   
+    return responseCsvFileProcess
 }
 
 async function createCSVFileFromArray(array, filename) {

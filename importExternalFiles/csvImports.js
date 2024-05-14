@@ -29,6 +29,8 @@ try {
     wrongElements.forEach((element)=>{
       loggerIapply.info(element)
     })
+    result[0].message='';
+    result[0].success=true;
     return result
 } catch (error) {
     
