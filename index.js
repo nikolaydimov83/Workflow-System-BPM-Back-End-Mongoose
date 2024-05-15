@@ -16,9 +16,7 @@ const logger = require('./logger/logger');
 const { filePathKey, filePathCert, CONNECTION_STRING, PORT, IP_ADDRESS } = require('./constants');
 const logRequest=require('./middlewares/loggerMiddleware');
 const { scheduleUploadIApplyData } = require('./scheduledTasks/shcheduleUploadIapplyData');
-const WinstonLog = require('./models/WinstonLog');
 const loggerIapply = require('./logger/iapplyLogger');
-const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
 
 const credentials = { 
   key: fs.readFileSync(filePathKey),

@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const { replaceIapplyTable } = require('../importExternalFiles/csvImports');
+const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
 const { extractZipArchive, renameFile } = require('../importExternalFiles/fileUtils');
 const path = require('path');
 const { baseDir } = require('../constants');
