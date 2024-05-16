@@ -3,6 +3,11 @@ const {baseDir} = require('../constants');
 const { checkDelimeter } = require('./fileUtils');
 const csv=require('csvtojson');
 const logger  = require('../logger/logger');
+const { checkIapplyId, checkFinCen } = require('../models/validators/requestValidators');
+const { getAllStatuses } = require('../services/statusServices');
+const { getUserByEmail } = require('../services/adminServices');
+const { get } = require('http');
+const { getWorkflowById } = require('../services/workflowServices');
 
 async function migrateRequests(){
 
@@ -15,9 +20,9 @@ async function migrateRequests(){
         if (!checkDelimeter(array,properHeadings)){
             throw new Error('Wrong delimeter provided!')
         }
-        array.forEach(element => {
+        array.forEach(async (element) => {
            const newElement=processElement(element) 
-           const checks=checkArrayElementData(newElement) 
+           const checks=await checkArrayElementData(newElement) 
            logger.info({
                 message: 'Transfer status for request migration',
                 method: 'POST',
@@ -38,16 +43,60 @@ async function migrateRequests(){
 
 }
 
-function checkArrayElementData(element){
+async function checkArrayElementData(element){
     const checks={}
     checks.deadlineDate=checkDeadlineDate(element.deadlineDate);
+    checks.iApplyId=await checkIapplyId(element.iApplyId);
+    checks.finCenter=await checkFinCen(element.finCenter);
+    checks.status=await checkStatusValidity(element.status);
+    checks.requestCreatorEmail=await checkEmail(element.requestCreatorEmail);
+    checks.description=checkDescription(element.description);
+    checks.requestWorkflow=await checkRequestedWorkflow(element.requestWorkflow);
+
     return checks;
 }
 function processElement(element){
     
     const newElement={...element}
     newElement.deadlineDate=element.deadlineDate.trim()
+    newElement.iApplyId=element.iApplyId.trim()
+    newElement.iApplyId=element.iApplyId.toUpperCase()
     return newElement
+}
+
+async function checkStatusValidity(status){
+    const statusesCurrentlyInDB=(await getAllStatuses()).map((s)=>s._id.toString());
+    
+    if (!statusesCurrentlyInDB.includes(status)){
+        return false
+    }else{
+        return true
+    
+    }
+}
+function checkDescription(description){ 
+    if (description.length<5){
+        return false
+    }else{
+        return true
+    }
+}
+
+async function checkEmail(email){
+    user=await getUserByEmail(email);
+    if (user){
+        return true 
+    }else{  
+        return false
+    }        
+}
+async function checkRequestedWorkflow(requestedWorkflow){
+    const workflow=await getWorkflowById(requestedWorkflow);
+    if (workflow){
+        return true
+    }else{
+        return false
+    }
 }
 function checkDeadlineDate(stringDate){
 stringDate=stringDate.trim();

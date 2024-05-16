@@ -22,7 +22,7 @@ const requestSchema=new Schema({
     statusIncomingDate:{type:Date, required:true},
     statusSender:{type:String,required:true},
     history:{type:[],default:[]},
-    description:{type:String, minLength:15},
+    description:{type:String, minLength:5},
     finCenter:{type:Number,required:true,validate:{
         validator:checkFinCen,
         message:(props)=>{return `${props.value} is not a valid Branch Number` }

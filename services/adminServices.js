@@ -78,7 +78,10 @@ async function editUserById(id,newUser){
     }
        
 }
-
+async function getUserByEmail(email){
+    let user=await UserActiveDir.findOne({email:email});
+    return user
+}
 async function editAllUsersWithRole(role){
     let users=await UserActiveDir.find({role:role});
     let updatedUsers=users.forEach(async (user)=>{
@@ -96,6 +99,7 @@ async function editAllUsersWithRole(role){
 
 module.exports={getAllActiveDirUsers,
                 getActiveDirUserByID,
+                getUserByEmail,
                 editUserById,
                 createUser,
                 createUsers,
