@@ -4,38 +4,70 @@ const { checkDelimeter } = require('./fileUtils');
 const csv=require('csvtojson');
 const logger  = require('../logger/logger');
 const { checkIapplyId, checkFinCen } = require('../models/validators/requestValidators');
-const { getAllStatuses } = require('../services/statusServices');
+const { getAllStatuses, getStatusById } = require('../services/statusServices');
 const { getUserByEmail } = require('../services/adminServices');
 const { get } = require('http');
 const { getWorkflowById } = require('../services/workflowServices');
+const { readIapplyData } = require('../services/iapplyServices');
+const { findSubjectByWorkflowId } = require('../services/subjectServices');
+const { create } = require('../models/Role');
+const { createRequest } = require('../services/requestServices');
 
 async function migrateRequests(){
 
     const csvFilePath=path.join(baseDir,'importExternalFiles','csv','requests.csv');
     const properHeadings=['deadlineDate','iApplyId','finCenter','status','requestCreatorEmail','description','requestWorkflow'];
     let array=[]; 
+    
     try {
         array=await csv({delimiter:';'}).fromFile(csvFilePath);
         csv()
         if (!checkDelimeter(array,properHeadings)){
             throw new Error('Wrong delimeter provided!')
         }
-        array.forEach(async (element) => {
-           const newElement=processElement(element) 
-           const checks=await checkArrayElementData(newElement) 
-           logger.info({
-                message: 'Transfer status for request migration',
-                method: 'POST',
-                url: 'N/A',
-                ip: 'N/A',
-                headers: 'N/A',
-                query: 'N/A',
-                body: element,
-                responseStatus:'N/A',
-                responseBody:checks
-           });           
-        });
 
+        const promises=array.map(async (element) => {
+           const newElement=processElement(element);
+           const checks=await checkArrayElementData(newElement);
+           if (checks.deadline&&checks.descr&&checks.email&&checks.finCen&&checks.iApply&&checks.stat&&checks.workflow){
+            return ({...newElement,...checks})
+           }else{
+                return undefined;
+           }
+                                 
+        });
+        const result=(await Promise.all(promises)).filter((item)=>item!==undefined);
+        const promisesForRequestCreateInDb=result.map(async (element) => { 
+                const requestForMigration=await prepareRequestForMigration(element);
+                try {
+                    await createRequest(requestForMigration);
+                    element.success=true;
+                    element.message='Request created successfully';
+                   /* logger.info({
+                        message: 'Transfer status for request migration',
+                        method: 'POST',
+                        url: 'N/A',
+                        ip: 'N/A',
+                        headers: 'N/A',
+                        query: 'N/A',
+                        body: element,
+                        responseStatus:'N/A',
+                        responseBody:requestForMigration
+                   }); */
+                    if(!element){
+                        console.log()
+                    }
+                    return element;
+
+                }catch (error){
+                    element.success=false;
+                    element.message=error.message;
+                    return element;
+                    
+                }
+        })
+        const resultForRequestCreateInDb=await Promise.all(promisesForRequestCreateInDb);
+        return resultForRequestCreateInDb;
         
     } catch (error) {
         return [{success:false,message:error.message}];
@@ -45,13 +77,13 @@ async function migrateRequests(){
 
 async function checkArrayElementData(element){
     const checks={}
-    checks.deadlineDate=checkDeadlineDate(element.deadlineDate);
-    checks.iApplyId=await checkIapplyId(element.iApplyId);
-    checks.finCenter=await checkFinCen(element.finCenter);
-    checks.status=await checkStatusValidity(element.status);
-    checks.requestCreatorEmail=await checkEmail(element.requestCreatorEmail);
-    checks.description=checkDescription(element.description);
-    checks.requestWorkflow=await checkRequestedWorkflow(element.requestWorkflow);
+    checks.deadline=checkDeadlineDate(element.deadlineDate);
+    checks.iApply=await crossCheckIapplyId(element.iApplyId);
+    checks.finCen=await checkFinCen(element.finCenter);
+    checks.stat=await checkStatusValidity(element.status);
+    checks.email=await checkEmail(element.requestCreatorEmail);
+    checks.descr=checkDescription(element.description);
+    checks.workflow=await checkRequestedWorkflow(element.requestWorkflow);
 
     return checks;
 }
@@ -75,7 +107,7 @@ async function checkStatusValidity(status){
     }
 }
 function checkDescription(description){ 
-    if (description.length<5){
+    if (!description||description.length<5){
         return false
     }else{
         return true
@@ -98,6 +130,21 @@ async function checkRequestedWorkflow(requestedWorkflow){
         return false
     }
 }
+async function crossCheckIapplyId(iApplyId){
+    if (iApplyId==='HL145860'){
+        console.log();
+    }
+    if (!await checkIapplyId(iApplyId)){
+        return false
+    }
+    const iApplyDataInDB=await readIapplyData(iApplyId);
+    if (!iApplyDataInDB){
+        return false
+    }else{  
+        return true
+    }
+}
+
 function checkDeadlineDate(stringDate){
 stringDate=stringDate.trim();
 let splittedDate=stringDate.split('.');
@@ -124,4 +171,39 @@ if (  [1].includes(splittedDate[1]) && splittedDate[0]>29){
 }
 return true
 }
+
+async function prepareRequestForMigration(requestForMigration) {
+    const old={...requestForMigration};
+    splittedDeadlineDate=requestForMigration.deadlineDate.split('.');
+    requestForMigration.deadlineDate=new Date(splittedDeadlineDate[2],splittedDeadlineDate[1]-1,splittedDeadlineDate[0]);
+    requestForMigration.statusIncomingDate = (new Date())
+    requestForMigration.statusSender = requestForMigration.requestCreatorEmail;
+
+    requestForMigration.history = [];
+    requestForMigration.status = await getStatusById(requestForMigration.status);
+    let historyEntry = { status:requestForMigration.status, 
+                        incomingDate: requestForMigration.statusIncomingDate, 
+                        statusSender: requestForMigration.requestCreatorEmail 
+                    };
+    
+    requestForMigration.history.push(historyEntry);
+    requestForMigration.status=requestForMigration.status._id;
+    let iApplyData = await readIapplyData(requestForMigration.iApplyId);
+    if (!iApplyData){
+        console.log()
+    }    
+    requestForMigration.amount = iApplyData.amount;
+
+    requestForMigration.ccy = iApplyData.ccy;
+    requestForMigration.clientEGFN = iApplyData.clientEGFN;
+    requestForMigration.clientName = iApplyData.clientName;
+    requestForMigration.iApplyId = iApplyData.iApplyId;
+    requestForMigration.product = iApplyData.product;
+    requestForMigration.refferingFinCenter = iApplyData.refferingFinCenter;
+    requestForMigration.subjectId = (await findSubjectByWorkflowId(requestForMigration.requestWorkflow))._id; 
+    requestForMigration.requestWorkflow = (await getWorkflowById(requestForMigration.requestWorkflow))._id
+    requestForMigration.skipDeadlineDateValidation = true;
+    return requestForMigration;
+}
+
 module.exports={migrateRequests}

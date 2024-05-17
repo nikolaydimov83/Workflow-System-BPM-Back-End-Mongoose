@@ -17,6 +17,9 @@ const { filePathKey, filePathCert, CONNECTION_STRING, PORT, IP_ADDRESS } = requi
 const logRequest=require('./middlewares/loggerMiddleware');
 const { scheduleUploadIApplyData } = require('./scheduledTasks/shcheduleUploadIapplyData');
 const loggerIapply = require('./logger/iapplyLogger');
+const Request = require('./models/Request');
+const WinstonLog = require('./models/WinstonLog');
+
 
 const credentials = { 
   key: fs.readFileSync(filePathKey),
@@ -74,7 +77,8 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
-
+      //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
+      //WinstonLog.deleteMany({})
     }
 }
 

@@ -62,8 +62,8 @@ function extractBodyPart(chunk) {
 
 function arrayToCSV(arr) {
     if (arr&&arr.length>0){
-    const header=Object.keys(arr[0]).join(',')
-    const body= arr.map(object=>(Object.values(object).join(','))).join('\n')
+    const header=Object.keys(arr[0]).join(';')
+    const body= arr.map((object)=>(Object.values(object).join(';'))).join('\n')
     const result= [header,body].join('\n')
     return result        
 }

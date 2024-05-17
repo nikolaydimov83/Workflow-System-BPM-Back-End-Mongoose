@@ -17,6 +17,10 @@ async function findWorkflowBySubjectId(subjectId){
     return subject.assignedToWorkflow
 }
 
+async function findSubjectByWorkflowId(workflowId){ 
+    return await Subject.findOne({assignedToWorkflow:workflowId})
+}
+
 async function findAllSubjectsByRole(role){
     let allWorkflows=await Workflow.find({}).populate('initialStatus');
     let workflows=allWorkflows.filter((workflow)=>workflow.initialStatus.statusType.toString()==role.toString());
@@ -45,5 +49,6 @@ module.exports={createSubject,
                 findWorkflowBySubjectId,
                 findAllSubjectsByRole,
                 getAllSubjects,
-                getSubjectById
+                getSubjectById,
+                findSubjectByWorkflowId
             }

@@ -6,7 +6,7 @@ const { checkIapplyId, checkEGN, checkFinCen } = require("./validators/requestVa
 const requestSchema=new Schema({
     requestWorkflow:{type:Types.ObjectId,ref:'Workflow',required:true},
     deadlineDate:{type:Date, required:true,validate:{
-        validator:async (value)=>{
+        validator:async function (value){
             if (this.skipDeadlineDateValidation) {
                 return true;
             }
@@ -45,7 +45,8 @@ const requestSchema=new Schema({
     ccy:{type:String, enum:['BGN', 'EUR','USD','Other']},
     comments:{type:[Types.ObjectId],ref:'Comment',default:[]},
     subjectId:{type:Types.ObjectId, ref:'Subject',req:true},
-    requestCreatorEmail:{type:String,ref:'User',req:true}  
+    requestCreatorEmail:{type:String,ref:'User',req:true},
+    skipDeadlineDateValidation:{type:Boolean,default:false}
 });
 
 requestSchema.index({iApplyId:1},{
