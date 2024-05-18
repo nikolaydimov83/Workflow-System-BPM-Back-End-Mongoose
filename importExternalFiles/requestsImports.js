@@ -12,6 +12,7 @@ const { readIapplyData } = require('../services/iapplyServices');
 const { findSubjectByWorkflowId } = require('../services/subjectServices');
 const { create } = require('../models/Role');
 const { createRequest } = require('../services/requestServices');
+const loggerMigrations = require('../logger/migrationsLogger');
 
 async function migrateRequests(){
 
@@ -38,30 +39,26 @@ async function migrateRequests(){
         });
         const result=(await Promise.all(promises)).filter((item)=>item!==undefined);
         const promisesForRequestCreateInDb=result.map(async (element) => { 
-                const requestForMigration=await prepareRequestForMigration(element);
                 try {
+                const requestForMigration=await prepareRequestForMigration(element);
+                
                     await createRequest(requestForMigration);
                     element.success=true;
                     element.message='Request created successfully';
-                   /* logger.info({
-                        message: 'Transfer status for request migration',
-                        method: 'POST',
-                        url: 'N/A',
-                        ip: 'N/A',
-                        headers: 'N/A',
-                        query: 'N/A',
-                        body: element,
-                        responseStatus:'N/A',
-                        responseBody:requestForMigration
-                   }); */
-                    if(!element){
-                        console.log()
-                    }
+                    loggerMigrations.info({
+                        message: 'Request created successfully',
+                        input:{requestForMigration:requestForMigration.iApplyId}
+                   });
+
                     return element;
 
                 }catch (error){
                     element.success=false;
                     element.message=error.message;
+                    loggerMigrations.info({
+                        message: error.message,
+                        input:{iApplyId:element.iApplyId}
+                   });
                     return element;
                     
                 }
@@ -131,9 +128,6 @@ async function checkRequestedWorkflow(requestedWorkflow){
     }
 }
 async function crossCheckIapplyId(iApplyId){
-    if (iApplyId==='HL145860'){
-        console.log();
-    }
     if (!await checkIapplyId(iApplyId)){
         return false
     }
