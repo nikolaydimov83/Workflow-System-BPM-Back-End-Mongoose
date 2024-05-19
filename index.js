@@ -77,8 +77,8 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
-      Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
-      WinstonLog.deleteMany({})
+      //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
+      //WinstonLog.deleteMany({})
     }
 }
 

@@ -8,8 +8,8 @@ reportsContoller.get('/',async (req,res)=>{
     let user=req.user;
 
    try {
-
-    let pendingList=await getAllPassedDeadlineUsrPndngReqs(user)
+    const page=Number(req.query.page);
+    let pendingList=await getAllPassedDeadlineUsrPndngReqs(user,page)
     res.status(201);    
     res.json(pendingList);
    
@@ -38,10 +38,10 @@ reportsContoller.get('/active',async (req,res)=>{
 
 reportsContoller.get('/all',async (req,res)=>{
     let user=req.user;
-    
+    const page=Number(req.query.page);
 
    try {
-    let data=await getAllReqs(user);
+    let data=await getAllReqs(user,page);
     res.status(201);    
     res.json(data);
    

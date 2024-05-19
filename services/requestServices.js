@@ -1,3 +1,4 @@
+const { Result } = require("express-validator");
 const Request = require("../models/Request");
 const Role = require("../models/Role");
 const Status=require('../models/Status');
@@ -7,6 +8,7 @@ const { sortWithType, escapeRegExp } = require("../utils/utils");
 const { getActiveDirUserByID } = require("./adminServices");
 const { createCommnet } = require("./commentServices");
 const { checkUserRoleIsPriviliged } = require("./workflowServices");
+const pageLength=500;
 
 async function createRequest(requestObject){
     return await (await Request.create(requestObject)).populate('status');
@@ -75,22 +77,27 @@ async function getAllActiveReqs(user){
     }
 }
 
-async function getAllReqs(user){
+async function getAllReqs(user, page){
     let userFinCenter=user.finCenter;
     let userRole=user.role;
     let contextAddition=userFinCenter>=111?` за клон ${userFinCenter}`:''
     let searchContextString='Всички заявки - активни и неактивни'+contextAddition;
-    
-    if(!(userRole.includes('Branch'))){
-        let result= await Request.find({})
-        .populate('status requestWorkflow subjectId comments').lean();
-        
-        result.sort((a,b)=>{
-            return ((new Date(b.deadlineDate) - new Date(a.deadlineDate)));
-        })
+    let query=Request.find({}).sort({deadlineDate:1})
 
-        return {result,searchContextString}
-    }else{
+    if((userRole.includes('Branch'))){ 
+        query.or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
+    }
+    if (page){
+        query.skip((page-1)*pageLength).limit(pageLength)
+    }
+    let result = await query.populate('status requestWorkflow subjectId comments').lean();
+    let collectionLength=await Request.countDocuments({})
+    /*result.sort((a,b)=>{
+        return ((new Date(b.deadlineDate) - new Date(a.deadlineDate)));
+    })*/    
+    return {result,searchContextString,collectionLength}
+    /*else{
+
         const result = await Request.find({})
         .or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
         .populate('status requestWorkflow subjectId comments').lean();
@@ -100,7 +107,7 @@ async function getAllReqs(user){
         })
         
         return {result,searchContextString}
-    }
+    }*/
 }
 async function getAllPassedDeadlineUsrPndngReqs(user){
     let userFinCenter=user.finCenter;
