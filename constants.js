@@ -10,5 +10,5 @@ const isPkg = typeof process.pkg !== 'undefined';
 const baseDir = isPkg ? path.dirname(process.execPath) : __dirname;
 const filePathCert = path.join(baseDir, 'keys', 'your-cert.pem');
 const filePathKey = path.join(baseDir, 'keys', 'your-private-key.pem');
-
-module.exports={CONNECTION_STRING,baseDir,filePathCert,filePathKey,PORT,IP_ADDRESS,FRONT_END_IP_ADDRESS}
+const pageLength=500;
+module.exports={CONNECTION_STRING,baseDir,filePathCert,filePathKey,PORT,IP_ADDRESS,FRONT_END_IP_ADDRESS,pageLength}

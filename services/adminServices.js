@@ -1,3 +1,4 @@
+const { pageLength } = require("../constants");
 const User = require("../models/User");
 const UserActiveDir = require("../models/UserActiveDir")
 
@@ -58,9 +59,14 @@ async function editUsers(userList){
         return result
     }
 
-async function getAllActiveDirUsers(){
-    let result = await UserActiveDir.find({});
-    return result
+async function getAllActiveDirUsers(page){
+    let query = UserActiveDir.find({});
+    if (page){
+        query.skip(10*(page-1)).limit(pageLength)
+    }
+    const result = await query.exec();
+    const collectionLength=await UserActiveDir.countDocuments();
+    return {result,collectionLength}
 }
 
 async function getActiveDirUserByID(id){

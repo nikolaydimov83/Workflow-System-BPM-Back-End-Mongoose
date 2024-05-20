@@ -22,9 +22,9 @@ searchController.post('/EGFN',async (req,res)=>{
 
 searchController.post('/all',async (req,res)=>{
     try {
-        
+        const page=Number(req.query.page);
         const searchString=req.body.searchString;
-        let serverResponseData=await getRequestsBySearchString(searchString)
+        let serverResponseData=await getRequestsBySearchString(searchString,page)
         //let sortedData=await sortTable(serverResponseData.result,req.body.sortCriteria,req.body.sortIndex)
         res.status(201);
         res.json(serverResponseData);

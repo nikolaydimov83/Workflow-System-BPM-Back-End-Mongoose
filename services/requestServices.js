@@ -8,13 +8,13 @@ const { sortWithType, escapeRegExp } = require("../utils/utils");
 const { getActiveDirUserByID } = require("./adminServices");
 const { createCommnet } = require("./commentServices");
 const { checkUserRoleIsPriviliged } = require("./workflowServices");
-const pageLength=500;
+const pageLength=require('../constants').pageLength;
 
 async function createRequest(requestObject){
     return await (await Request.create(requestObject)).populate('status');
 }
 
-async function getAllUserPendingRequests(user){
+async function getAllUserPendingRequests(user, page){
     let userFinCenter=user.finCenter;
     let userRole=user.role;
     
@@ -23,28 +23,24 @@ async function getAllUserPendingRequests(user){
     
     const allStatusesRelatedToUserRole=await Status.find({statusType:activeDirUserRoleId})
     let searchContextString='Заявки за изпълнение';
-    if(!(userRole.includes('Branch'))){
-        let result= await Request.find({}).where('status').in(allStatusesRelatedToUserRole).populate('status requestWorkflow subjectId comments').lean();
-        
-        result.sort((a,b)=>{
-            return ((new Date(b.statusIncomingDate) - new Date(a.statusIncomingDate)));
-        })
-
-        return {result,searchContextString}
-    }else{
-        const result = await Request.find({})
-        .or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
-        .where('status').in(allStatusesRelatedToUserRole).populate('status requestWorkflow subjectId comments').lean();
-
-        result.sort((a,b)=>{
-            return ((new Date(a.deadlineDate) - new Date(b.deadlineDate)));
-        })
-        let searchContextString='Заявки за изпълнение';
-        return {result,searchContextString}
+    let query=Request.find({})
+        .where('status').in(allStatusesRelatedToUserRole)
+        .sort({deadlineDate:1})
+    if((userRole.includes('Branch'))){ 
+        query.or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
     }
+    const countQuery=query.clone()
+    const collectionLength=await countQuery.countDocuments();
+
+    if (page){
+        query.skip((page-1)*pageLength).limit(pageLength)
+    }
+    let result = await query.populate('status requestWorkflow subjectId comments').lean();
+
+    return {result,searchContextString,collectionLength}
 
 }
-async function getAllActiveReqs(user){
+async function getAllActiveReqs(user,page){
     let userFinCenter=user.finCenter;
     let userRole=user.role;
     let contextAddition=userFinCenter>=111?` за клон ${userFinCenter}`:''
@@ -52,29 +48,24 @@ async function getAllActiveReqs(user){
     let closedRole=await Role.findOne({role:'Closed'});
     const allRelevantStatuses=await Status.find({}).where('statusType').ne(closedRole.id);
 
-    if(!(userRole.includes('Branch'))){
         let allRelevantWorkflows=await getRelevantWorkflowsByUsrRole(userRole);
-        let result= await Request.find({})
+        const query = Request.find({})
         .where('status').in(allRelevantStatuses)
         .where('requestWorkflow').in(allRelevantWorkflows)
-        .populate('status requestWorkflow subjectId comments').lean();
-        
-        result.sort((a,b)=>{
-            return ((new Date(b.deadlineDate) - new Date(a.deadlineDate)));
-        })
+        .sort({deadlineDate:1})
 
-        return {result,searchContextString}
-    }else{
-        const result = await Request.find({})
-        .or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}]).where('status').in(allRelevantStatuses)
-        .populate('status requestWorkflow subjectId comments').lean();
+        if((userRole.includes('Branch'))){ 
+            query.or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
+        }
+        const countQuery=query.clone()
+        const collectionLength=await countQuery.countDocuments();
+        if (page){
+            query.skip((page-1)*pageLength).limit(pageLength)
+        }
+        const result = await query.populate('status requestWorkflow subjectId comments').lean();
+        return {result,searchContextString, collectionLength}
 
-        result.sort((a,b)=>{
-            return ((new Date(a.deadlineDate) - new Date(b.deadlineDate)));
-        })
-        
-        return {result,searchContextString}
-    }
+    
 }
 
 async function getAllReqs(user, page){
@@ -87,29 +78,15 @@ async function getAllReqs(user, page){
     if((userRole.includes('Branch'))){ 
         query.or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
     }
+    const countQuery=query.clone()
+    const collectionLength=await countQuery.countDocuments();
     if (page){
         query.skip((page-1)*pageLength).limit(pageLength)
     }
     let result = await query.populate('status requestWorkflow subjectId comments').lean();
-    let collectionLength=await Request.countDocuments({})
-    /*result.sort((a,b)=>{
-        return ((new Date(b.deadlineDate) - new Date(a.deadlineDate)));
-    })*/    
     return {result,searchContextString,collectionLength}
-    /*else{
-
-        const result = await Request.find({})
-        .or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
-        .populate('status requestWorkflow subjectId comments').lean();
-
-        result.sort((a,b)=>{
-            return ((new Date(a.deadlineDate) - new Date(b.deadlineDate)));
-        })
-        
-        return {result,searchContextString}
-    }*/
 }
-async function getAllPassedDeadlineUsrPndngReqs(user){
+async function getAllPassedDeadlineUsrPndngReqs(user,page){
     let userFinCenter=user.finCenter;
     let userRole=user.role;
     let currentDate = new Date().toISOString();
@@ -117,32 +94,23 @@ async function getAllPassedDeadlineUsrPndngReqs(user){
     let searchContextString='Забавени заявки '+contextAddition;
     let closedRole=await Role.findOne({role:'Closed'});
     const allRelevantStatuses=await Status.find({}).where('statusType').ne(closedRole.id);
-    
-    if(!(userRole.includes('Branch'))){
-        let allRelevantWorkflows=await getRelevantWorkflowsByUsrRole(userRole);
-        let result= await Request.find({})
+    let allRelevantWorkflows=await getRelevantWorkflowsByUsrRole(userRole);
+    let query = Request.find({})
         .where('status').in(allRelevantStatuses)
         .where('deadlineDate').lte(currentDate)
         .where('requestWorkflow').in(allRelevantWorkflows)
-        .populate('status requestWorkflow subjectId comments').lean();
+        .sort({deadlineDate:1})
         
-        result.sort((a,b)=>{
-            return ((new Date(b.deadlineDate) - new Date(a.deadlineDate)));
-        })
-
-        return {result,searchContextString}
-    }else{
-        const result = await Request.find({})
-        .or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}]).where('status').in(allRelevantStatuses)
-        .where('deadlineDate').lte(currentDate).populate('status requestWorkflow subjectId comments').lean();
-
-        result.sort((a,b)=>{
-            return ((new Date(a.deadlineDate) - new Date(b.deadlineDate)));
-        })
-        
-        return {result,searchContextString}
+    if((userRole.includes('Branch'))){ 
+    query.or([{finCenter:userFinCenter},{refferingFinCenter:userFinCenter}])
     }
-
+    const countQuery=query.clone()
+    const collectionLength=await countQuery.countDocuments();
+    if (page){
+            query.skip((page-1)*pageLength).limit(pageLength)
+    }
+    const result = await query.populate('status requestWorkflow subjectId comments').lean();
+    return {result,searchContextString,collectionLength}
 }
 
 async function sortTable(data, sortProperty,sortIndex){
@@ -200,15 +168,18 @@ async function getRequestsBySearchString(searchString){
     }
 
     if (searchType=='finCenter'){
-        const result = await Request.find({})
-        .or([{finCenter:searchString},{refferingFinCenter:searchString}])
-        .populate('status requestWorkflow subjectId comments').lean();
-   
-        result.sort((a,b)=>{
-            return ((new Date(a.deadlineDate) - new Date(b.deadlineDate)));
-        })
+        const query=Request.find({})
+            .or([{finCenter:searchString},{refferingFinCenter:searchString}])
+            .sort({deadlineDate:1})
+        const countQuery=query.clone();
+        const collectionLength=await countQuery.countDocuments();
+        if (page){
+            query.skip((page-1)*pageLength).limit(pageLength)
+        }
+        result = await query
+            .populate('status requestWorkflow subjectId comments').lean();
 
-        return {result,searchContextString}
+        return {result,searchContextString,collectionLength}
     }
     if (searchType=='other'){
         let result={}
@@ -220,19 +191,27 @@ async function getRequestsBySearchString(searchString){
             subjectName:{$regex:'.*' + regexSanitizedSearchString + '.*',$options:'i'}
         })
         let workflowsLikeSearchString=subjectsLikeSearchString.map((subject)=>subject.assignedToWorkflow);
-        let requestwithStatusMatch=await Request
+        let requestwithStatusMatchQuery=Request
             .find({})
             .or([
                 {status:{$in:statusesLikeSearchString}},
                 {requestWorkflow:{$in:workflowsLikeSearchString}},
                 {clientName:{$regex:'.*' + regexSanitizedSearchString + '.*',$options:'i'}}
             ])
+            .sort({deadlineDate:1})
+        const countQuery=requestwithStatusMatchQuery.clone();
+        const collectionLength=await countQuery.countDocuments();
+        if (page){
+            requestwithStatusMatchQuery.skip((page-1)*pageLength).limit(pageLength)
+        }
+        
+            const requestwithStatusMatch=await requestwithStatusMatchQuery
             .populate({path:'status',populate: { path: 'nextStatuses' }})
             .populate('requestWorkflow')
             .populate('comments').populate('subjectId').populate({path:'comments',populate: { path: 'commentOwner' }})
             .lean()
         
-            return {result:requestwithStatusMatch,searchContextString}
+            return {result:requestwithStatusMatch,searchContextString,collectionLength}
 
        
     }

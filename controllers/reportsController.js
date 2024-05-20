@@ -6,7 +6,6 @@ const reportsContoller=require('express').Router();
 
 reportsContoller.get('/',async (req,res)=>{
     let user=req.user;
-
    try {
     const page=Number(req.query.page);
     let pendingList=await getAllPassedDeadlineUsrPndngReqs(user,page)
@@ -22,10 +21,9 @@ reportsContoller.get('/',async (req,res)=>{
 
 reportsContoller.get('/active',async (req,res)=>{
     let user=req.user;
-    
-
+    const page=Number(req.query.page);
    try {
-    let data=await getAllActiveReqs(user);
+    let data=await getAllActiveReqs(user,page);
     res.status(201);    
     res.json(data);
    

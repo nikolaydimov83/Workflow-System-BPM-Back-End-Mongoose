@@ -9,10 +9,10 @@ const dataController=require('express').Router();
 
 dataController.get('/',async (req,res)=>{
     let user=req.user;
-
+    const page=Number(req.query.page);
    try {
 
-    let pendingList=await getAllUserPendingRequests(user)
+    let pendingList=await getAllUserPendingRequests(user,page)
     res.status(201);    
     res.json(pendingList);
    
@@ -23,6 +23,7 @@ dataController.get('/',async (req,res)=>{
    }
 
 });
+
 dataController.post('/',async (req,res)=>{
     let user=req.user;
     let sortProperty=req.body.sortCriteria;

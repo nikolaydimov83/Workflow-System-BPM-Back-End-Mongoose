@@ -7,7 +7,9 @@ const adminUsersRightsControler=require('express').Router();
 
 adminUsersRightsControler.get('/',async(req,res)=>{
     try {
-        let data=await getAllActiveDirUsers();
+        const page=Number(req.query.page);
+        let data=await getAllActiveDirUsers(page);
+        
         res.status(201);
         res.json(data);
     } catch (error) {
