@@ -7,6 +7,7 @@ const createController = require("./controllers/createController");
 const dataController = require("./controllers/dataController");
 const editController = require("./controllers/editController");
 const fileUploadsController = require("./controllers/fileUploadsController");
+const historyController = require("./controllers/historyController");
 const iApplyConroller = require("./controllers/iapplyDataController");
 const loggerController = require("./controllers/loggerControler");
 const reportsContoller = require("./controllers/reportsController");
@@ -32,6 +33,7 @@ module.exports=(app)=>{
     app.use('/workflow',workflowController);
     app.use('/wrongDataLogger',loggerController)
     app.use('/files', fileUploadsController);
+    app.use('/history',historyController);
     app.use('*',unknownController);        
     } catch (error) {
         app.use((req,res,next)=>{

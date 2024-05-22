@@ -8,6 +8,7 @@ const { sortWithType, escapeRegExp } = require("../utils/utils");
 const { getActiveDirUserByID } = require("./adminServices");
 const { createCommnet } = require("./commentServices");
 const { checkUserRoleIsPriviliged } = require("./workflowServices");
+const { getStatusById } = require("./statusServices");
 const pageLength=require('../constants').pageLength;
 
 async function createRequest(requestObject){
@@ -141,7 +142,7 @@ async function getRequestsByClientEGFN(clientEGFN){
         let searchContextString='Намерени по Булстат/ЕГН: '+clientEGFN;
         return {result,searchContextString}
 }
-async function getRequestsBySearchString(searchString){
+async function getRequestsBySearchString(searchString,page){
     
     const iApplyRegex=/^[A-Z]{2}[0-9]+$/;
     const EGFNRegex=/^[0-9]{9,10}$/;
@@ -230,7 +231,8 @@ async function getRequestsBySearchString(searchString){
 }
 async function editRequestStatus(requestId,newStatusId,email){
     let statusIncomingDate = (new Date());
-    let historyEntry = { status:newStatusId, incomingDate: statusIncomingDate, statusSender: email };
+    const newStatus=await getStatusById(newStatusId);
+    let historyEntry = { status:newStatus, incomingDate: statusIncomingDate, statusSender: email };
     let request=await Request.findByIdAndUpdate(requestId,{   
                         $push: { history: historyEntry },
                         $set:{
@@ -255,7 +257,17 @@ async function changeRequestDeadline(requestId,newData, user){
     return request
 }
 
-
+async function getRequestHistoryById(requestId){
+    let request=await Request 
+        .findById(requestId)
+        .populate('history.status')
+        .populate('history.statusSender')
+        .populate('history.incomingDate')
+    /*request.history.map((entry)=>{
+        entry.incomingDate=entry.incomingDate.toISOString()
+    })*/
+    return request.history
+}
 async function getUserRights(databaseRequest, user,newStatusId) {
     let activeDirUser=await getActiveDirUserByID(user.userStaticInfo.toString());
     if (await checkUserRoleIsPriviliged(databaseRequest.requestWorkflow._id,user)){
@@ -314,5 +326,6 @@ module.exports={
                     getRequestsByClientEGFN,
                     getRequestsBySearchString,
                     getAllActiveReqs,
-                    getAllReqs
+                    getAllReqs,
+                    getRequestHistoryById
                 }

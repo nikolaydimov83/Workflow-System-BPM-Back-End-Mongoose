@@ -9,6 +9,7 @@ const { createRequest } = require('../services/requestServices');
 const { findWorkflowBySubjectId, findAllSubjectsByRole } = require('../services/subjectServices');
 const { parseError } = require('../utils/utils');
 const { getActiveDirUserByID } = require('../services/adminServices');
+const { getStatusById } = require('../services/statusServices');
 const createController=require('express').Router();
 
 const emailSubjectForCreate='PlanB New Request Created'
@@ -65,8 +66,8 @@ async function prepareBodyForRequestCreate(req) {
     body.statusSender = req.user.email;
 
     body.history = [];
-
-    let historyEntry = { status: status, incomingDate: body.statusIncomingDate, statusSender: req.user.email };
+    const statusFromDB=await getStatusById(body.status);
+    let historyEntry = { status: statusFromDB, incomingDate: body.statusIncomingDate, statusSender: req.user.email };
     body.history.push(historyEntry);
 
     let iApplyData = await readIapplyData(iApplyId);

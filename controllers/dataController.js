@@ -1,6 +1,4 @@
-const Request = require('../models/Request');
-const Workflow = require('../models/Workflow');
-const { getAllUserPendingRequests, sortTable, getRequestById, getUserRights } = require('../services/requestServices');
+const { getAllUserPendingRequests, getRequestById, getUserRights } = require('../services/requestServices');
 const { getAllClosedStatuses } = require('../services/statusServices');
 const { getWorkflowById } = require('../services/workflowServices');
 const { parseError } = require('../utils/utils');
