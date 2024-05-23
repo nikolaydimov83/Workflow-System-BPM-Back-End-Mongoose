@@ -103,17 +103,6 @@ async function prepareRequestForMigration(requestForMigration) {
 
 function convertRequestModelToObject(request){
     const requestObject={...request};
-    if (!requestObject.requestWorkflow._id){
-        console.log()
-    }
-
-    if (!requestObject.subjectId._id){
-        console.log()
-    }
-
-    if (!requestObject.subjectId._id){
-        console.log()
-    }
     requestObject.status = requestObject.status?._id.toString();
     requestObject.requestWorkflow = requestObject.requestWorkflow._id.toString();
     requestObject.subjectId = requestObject.subjectId._id.toString();

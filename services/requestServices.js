@@ -313,6 +313,11 @@ async function getRelevantWorkflowsByUsrRole(userRole){
     const allRelevantWorkflows=await Workflow.find({}).where('allowedStatuses').in(statusesInTheWorkflow)
     return allRelevantWorkflows
 }
+
+async function getRequestsByIApplyId(iApplyId){
+    return await Request.find({iApplyId:iApplyId})
+
+}
 module.exports={
                     createRequest,
                     getAllUserPendingRequests,
@@ -327,5 +332,6 @@ module.exports={
                     getRequestsBySearchString,
                     getAllActiveReqs,
                     getAllReqs,
-                    getRequestHistoryById
+                    getRequestHistoryById,
+                    getRequestsByIApplyId
                 }

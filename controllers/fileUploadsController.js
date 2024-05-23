@@ -51,6 +51,15 @@ fileUploadsController.post('/migrateRequests',async(req,res)=>{
     }
 });
 
+fileUploadsController.post('/changeOwners',async(req,res)=>{
+    try {
+        await processIncomingCSVFile(req,res,'change_requests_owner.csv',migrateRequests)           
+    } catch (error) {
+        res.status(401);
+        res.json({message:parseError(error)});
+    }
+});
+
 async function processIncomingCSVFile(req, res, filename,processingFunction,functionOnFinish) {
     try {
         if (!req.headers['content-type'].startsWith('text/csv')) {
@@ -84,5 +93,5 @@ async function processIncomingCSVFile(req, res, filename,processingFunction,func
     }
 }
 
-
+//changeOwners
 module.exports=fileUploadsController
