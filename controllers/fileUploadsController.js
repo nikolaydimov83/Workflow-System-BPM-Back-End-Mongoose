@@ -6,6 +6,7 @@ const { baseDir } = require('../constants');
 const { processExternalCsvFile, deleteFileAsync } = require('../importExternalFiles/fileUtils');
 const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
 const { migrateRequests } = require('../importExternalFiles/requestsImports');
+const { changeOwners } = require('../importExternalFiles/requestsOwnerChange');
 
 
 const fileUploadsController=require('express').Router();
@@ -53,7 +54,7 @@ fileUploadsController.post('/migrateRequests',async(req,res)=>{
 
 fileUploadsController.post('/changeOwners',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'change_requests_owner.csv',migrateRequests)           
+        await processIncomingCSVFile(req,res,'change_requests_owner.csv',changeOwners)           
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});

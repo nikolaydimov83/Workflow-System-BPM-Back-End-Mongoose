@@ -11,7 +11,7 @@ const { checkArrayElementData, sanitizeElement } = require('./requestDataChecks'
 const { getStatusById } = require('../services/statusServices');
 const { getUserByEmail } = require('../services/adminServices');
 
-async function migrateRequests(){
+async function changeOwners(){
 
     const csvFilePath=path.join(baseDir,'importExternalFiles','csv','change_requests_owner.csv');
     const properHeadings=['email','iApplyId'];
@@ -40,7 +40,7 @@ async function migrateRequests(){
                     loggerMigrations.info({
                         message: 'Request created successfully',
                         input:  {
-                                requestForMigration:(convertRequestModelToObject(request))
+                                requestForMigration:(request)
                                 }
                    });                    
                 }
@@ -73,4 +73,4 @@ function convertRequestModelToObject(request){
     return requestObject;
 
 }
-module.exports={migrateRequests}
+module.exports={changeOwners}
