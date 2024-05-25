@@ -10,11 +10,12 @@ const loggerMigrations = require('../logger/migrationsLogger');
 const { checkArrayElementData, sanitizeElement } = require('./requestDataChecks');
 const { getStatusById } = require('../services/statusServices');
 const { getUserByEmail } = require('../services/adminServices');
+const { checkFinCen } = require('../models/validators/requestValidators');
 
-async function changeOwners(){
+async function changeBranch(){
 
-    const csvFilePath=path.join(baseDir,'importExternalFiles','csv','change_requests_owner.csv');
-    const properHeadings=['email','iApplyId'];
+    const csvFilePath=path.join(baseDir,'importExternalFiles','csv','change_requests_branch.csv');
+    const properHeadings=['finCenter','iApplyId'];
     let array=[]; 
     
     try {
@@ -24,21 +25,22 @@ async function changeOwners(){
             throw new Error('Wrong delimeter provided!')
         }
         for (const element of array) {
-            const checks={mailCheck:false,iApplyCheck:false};  
-            await getUserByEmail(element.email)?checks.mailCheck=true:checks.mailCheck=false; 
+            const checks={finCen:false,iApplyCheck:false};  
+            //await getUserByEmail(element.email)?checks.mailCheck=true:checks.mailCheck=false; 
+            await checkFinCen(element.finCenter)?checks.finCen=true:checks.finCen==false;
             const requests=(await getRequestsByIApplyId(element.iApplyId))
             if (requests.length>0){
                 checks.iApplyCheck=true;
             } 
-            if (checks.mailCheck&&checks.iApplyCheck){
+            if (checks.finCen&&checks.iApplyCheck){
                 for (const request of requests) {
-                    request.requestCreatorEmail=element.email;
+                    request.finCenter=element.finCenter;
                     await request.save();
                     element.success=true;
-                    element.message='Request updated successfully';
+                    element.message='Request Fin center updated successfully';
                     element.numberOfChangedRequests=requests.length;
                     loggerMigrations.info({
-                        message: 'Request updated successfully',
+                        message: 'Request FinCenter updated successfully',
                         input:  {
                                 requestForMigration:(request)
                                 }
@@ -46,9 +48,9 @@ async function changeOwners(){
                 }
                }else{
                 element.success=false;
-                element.message='User or iApplyId not found';
+                element.message='iApplyId not found or Fin center wrong format';
                 loggerMigrations.info({
-                    message: 'User or iApplyId not found',
+                    message: 'iApplyId not found or Fin center wrong format',
                     input:(element)
                });
                }                         
@@ -63,14 +65,4 @@ async function changeOwners(){
 
 }
 
-function convertRequestModelToObject(request){
-    const requestObject={...request};
-
-    requestObject.status = requestObject.status?._id.toString();
-    requestObject.requestWorkflow = requestObject.requestWorkflow._id.toString();
-    requestObject.subjectId = requestObject.subjectId._id.toString();
-    requestObject.history=requestObject.history.map((entry)=>entry.status._id.toString());
-    return requestObject;
-
-}
-module.exports={changeOwners}
+module.exports={changeBranch}

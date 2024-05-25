@@ -7,6 +7,7 @@ const { processExternalCsvFile, deleteFileAsync } = require('../importExternalFi
 const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
 const { migrateRequests } = require('../importExternalFiles/requestsImports');
 const { changeOwners } = require('../importExternalFiles/requestsOwnerChange');
+const { changeBranch } = require('../importExternalFiles/requestsBranchChange');
 
 
 const fileUploadsController=require('express').Router();
@@ -61,6 +62,14 @@ fileUploadsController.post('/changeOwners',async(req,res)=>{
     }
 });
 
+fileUploadsController.post('/changeBranch',async(req,res)=>{
+    try {
+        await processIncomingCSVFile(req,res,'change_requests_branch.csv',changeBranch)           
+    } catch (error) {
+        res.status(401);
+        res.json({message:parseError(error)});
+    }
+});
 async function processIncomingCSVFile(req, res, filename,processingFunction,functionOnFinish) {
     try {
         if (!req.headers['content-type'].startsWith('text/csv')) {
