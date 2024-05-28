@@ -26,9 +26,8 @@ try {
     }
     let wrongElements=await cleanArray(array)
     await performTransaction(array)
-    wrongElements.forEach((element)=>{
-      loggerIapply.info(element)
-    })
+    wrongElements.map(element=>loggerIapply.info(element))
+
     result[0].message='';
     result[0].success=true;
     return result

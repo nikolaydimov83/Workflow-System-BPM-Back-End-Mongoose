@@ -14,7 +14,7 @@ const fileUploadsController=require('express').Router();
 
 fileUploadsController.post('/usersFileUpload',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'users.csv',uploadUsersFromCSVFile);           
+        await processIncomingCSVFile(req,res,'users.csv',uploadUsersFromCSVFile,deleteFileAsync);           
       
     } catch (error) {
         res.status(401);
@@ -26,7 +26,7 @@ fileUploadsController.post('/usersFileUpload',async(req,res)=>{
 
 fileUploadsController.post('/usersFileEdit',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'editUsers.csv',editUsersFromCSVFile)
+        await processIncomingCSVFile(req,res,'editUsers.csv',editUsersFromCSVFile,deleteFileAsync)
                   
     } catch (error) {
         res.status(401);
@@ -37,7 +37,7 @@ fileUploadsController.post('/usersFileEdit',async(req,res)=>{
 
 fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'iApply.csv',replaceIapplyTable)           
+        await processIncomingCSVFile(req,res,'iApply.csv',replaceIapplyTable,deleteFileAsync)           
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});
@@ -46,7 +46,7 @@ fileUploadsController.post('/manuallyUploadIapplyData',async(req,res)=>{
 
 fileUploadsController.post('/migrateRequests',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'requests.csv',migrateRequests)           
+        await processIncomingCSVFile(req,res,'requests.csv',migrateRequests,deleteFileAsync)           
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});
@@ -55,7 +55,7 @@ fileUploadsController.post('/migrateRequests',async(req,res)=>{
 
 fileUploadsController.post('/changeOwners',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'change_requests_owner.csv',changeOwners)           
+        await processIncomingCSVFile(req,res,'change_requests_owner.csv',changeOwners,deleteFileAsync)           
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});
@@ -64,7 +64,7 @@ fileUploadsController.post('/changeOwners',async(req,res)=>{
 
 fileUploadsController.post('/changeBranch',async(req,res)=>{
     try {
-        await processIncomingCSVFile(req,res,'change_requests_branch.csv',changeBranch)           
+        await processIncomingCSVFile(req,res,'change_requests_branch.csv',changeBranch,deleteFileAsync)           
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});

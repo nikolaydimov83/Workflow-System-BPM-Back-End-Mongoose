@@ -19,6 +19,7 @@ const { scheduleUploadIApplyData } = require('./scheduledTasks/shcheduleUploadIa
 const loggerIapply = require('./logger/iapplyLogger');
 const Request = require('./models/Request');
 const WinstonLog = require('./models/WinstonLog');
+const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
 
 
 const credentials = { 
@@ -55,14 +56,6 @@ async function start(){
     }
     scheduleUploadIApplyData()
     app.use(express.json());
-    app.use(winstonExpress.logger({
-      winstonInstance:logger,
-      statusLevels:true
-    }));
-    app.use(winstonExpress.logger({
-      winstonInstance:loggerIapply,
-      statusLevels:true
-    }));
     app.use(logRequest());
     app.use(cors(corsOptions));
     app.use(verifyToken());
@@ -77,8 +70,9 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
-      //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
+      Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
       //WinstonLog.deleteMany({})
+      WinstonLogIapplyTransfer.deleteMany({}).then(()=>console.log('Requests deleted!'));
     }
 }
 

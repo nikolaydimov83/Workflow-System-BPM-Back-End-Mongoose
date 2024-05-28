@@ -42,17 +42,20 @@ module.exports=()=>(req, res, next) => {
     }    
     res.on('finish',()=>{
       responseBody = responseBody.replace(/"accessToken":"[^"]+"/g, '"accessToken":"***"');
-      logger.info({
-        message: 'Incoming Request',
-        method: req.method,
-        url: req.url,
-        ip: clientIp,
-        headers: filteredHeaders,
-        query: req.query,
-        body: filteredBody,
-        responseStatus:res.statusCode,
-        responseBody:responseBody
-      });
+      if ((req.method !== 'GET'&&req.method!=='OPTIONS')||req.url==='logout') {
+        logger.info({
+          message: 'Incoming Request',
+          method: req.method,
+          url: req.url,
+          ip: clientIp,
+          headers: filteredHeaders,
+          query: req.query,
+          body: filteredBody,
+          responseStatus:res.statusCode,
+          responseBody:responseBody
+        });        
+      }
+
     })
 
 
