@@ -9,7 +9,6 @@ searchController.post('/EGFN',async (req,res)=>{
         
         const EGFN=req.body.searchData;
         let serverResponseData=await getRequestsByClientEGFN(EGFN)
-        //let sortedData=await sortTable(serverResponseData,req.body.sortCriteria,req.body.sortIndex)
         res.status(201);
         res.json(serverResponseData);
     } catch (error) {
@@ -25,7 +24,6 @@ searchController.post('/all',async (req,res)=>{
         const page=Number(req.query.page);
         const searchString=req.body.searchString;
         let serverResponseData=await getRequestsBySearchString(searchString,page)
-        //let sortedData=await sortTable(serverResponseData.result,req.body.sortCriteria,req.body.sortIndex)
         res.status(201);
         res.json(serverResponseData);
     } catch (error) {

@@ -11,8 +11,6 @@ historyController.get('/:id',async (req,res)=>{
     let historyList=await getRequestHistoryById(id)
     res.status(201);    
     res.json(historyList);
-   
-    
    } catch (error) {
     res.status(400);
     res.json({message:parseError(error)});

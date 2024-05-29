@@ -1,4 +1,4 @@
-const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
+/*const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
 
 //This service is not used in the current version of the application
 
@@ -14,4 +14,4 @@ changeIapplyController.get('/',async (req,res)=>{
 
 
 
-module.exports=changeIapplyController;
+module.exports=changeIapplyController;*/

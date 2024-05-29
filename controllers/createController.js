@@ -1,9 +1,4 @@
-const { Types } = require('mongoose');
 const { serverSendMail, emailAdress, prepareMailContent } = require('../emailClient/mail');
-
-const Request = require('../models/Request');
-const Subject = require('../models/Subject');
-const User = require('../models/User');
 const { readIapplyData } = require('../services/iapplyServices');
 const { createRequest } = require('../services/requestServices');
 const { findWorkflowBySubjectId, findAllSubjectsByRole } = require('../services/subjectServices');
@@ -57,7 +52,7 @@ async function prepareBodyForRequestCreate(req) {
     let iApplyId = body.iApplyId;
     let requestWorkflow = await findWorkflowBySubjectId(body.subjectId);
     if (!requestWorkflow){
-        throw new Error('The subject you are chising does not correspond to any Workflow!')
+        throw new Error('The subject you are choosing does not correspond to any Workflow!')
     }
     body.requestWorkflow = requestWorkflow.id;
     let status = requestWorkflow.allowedStatuses[0];

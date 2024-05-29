@@ -1,8 +1,5 @@
 const { uploadUsersFromCSVFile, editUsersFromCSVFile } = require('../importExternalFiles/userActiveDirImports');
 const { parseError } = require('../utils/utils');
-
-const path = require('path');
-const { baseDir } = require('../constants');
 const { processExternalCsvFile, deleteFileAsync } = require('../importExternalFiles/fileUtils');
 const { replaceIapplyTable } = require('../importExternalFiles/iApplyImports');
 const { migrateRequests } = require('../importExternalFiles/requestsImports');

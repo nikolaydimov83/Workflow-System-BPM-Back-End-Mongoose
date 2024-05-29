@@ -1,9 +1,4 @@
-const Comment = require('../models/Comment');
-const IApply = require('../models/IApply');
-const Request = require('../models/Request');
-const { createCommnet } = require('../services/commentServices');
-const { readIapplyData } = require('../services/iapplyServices');
-const { getRequestById, addCommentToRequest } = require('../services/requestServices');
+const { addCommentToRequest } = require('../services/requestServices');
 const { parseError } = require('../utils/utils');
 
 const commentsController=require('express').Router();

@@ -1,4 +1,3 @@
-const IApply = require('../models/IApply');
 const { readIapplyData, changeIapplyDataByIApplyId } = require('../services/iapplyServices');
 const { parseError } = require('../utils/utils');
 

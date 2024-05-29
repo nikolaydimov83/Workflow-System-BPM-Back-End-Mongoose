@@ -177,7 +177,7 @@ async function getRequestsBySearchString(searchString,page){
         if (page){
             query.skip((page-1)*pageLength).limit(pageLength)
         }
-        result = await query
+        const result = await query
             .populate('status requestWorkflow subjectId comments').lean();
 
         return {result,searchContextString,collectionLength}
@@ -216,18 +216,23 @@ async function getRequestsBySearchString(searchString,page){
 
        
     }
+    const query = Request.find({}).where(searchType).equals(searchString).sort({deadlineDate:1})
 
-    let result= await Request.find({})
-        .where(searchType).equals(searchString)
+    const countQuery =query.clone();
+    const collectionLength=await countQuery.countDocuments();
+    if (page){
+        query.skip((page-1)*pageLength).limit(pageLength)
+    }
+    let result= await query
         .populate({path:'status',populate: { path: 'nextStatuses' }})
         .populate('requestWorkflow')
         .populate('comments').populate('subjectId').populate({path:'comments',populate: { path: 'commentOwner' }})
         .lean()
         
-        result.sort((a,b)=>{
+        /*result.sort((a,b)=>{
             return ((new Date(b.statusIncomingDate) - new Date(a.statusIncomingDate)));
-        })
-        return {result,searchContextString}
+        })*/
+        return {result,searchContextString,collectionLength}
 }
 async function editRequestStatus(requestId,newStatusId,email){
     let statusIncomingDate = (new Date());

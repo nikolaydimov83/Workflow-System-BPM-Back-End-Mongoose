@@ -21,26 +21,19 @@ const Request = require('./models/Request');
 const WinstonLog = require('./models/WinstonLog');
 const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
 const { error } = require('console');
+const errorLogger = require('./logger/errorLogger');
+const WinstonError = require('./models/WinstonError');
 
 
 const credentials = { 
   key: fs.readFileSync(filePathKey),
   cert: fs.readFileSync(filePathCert),
 }
-/*process.on('uncaughtException', async (error) => {
-    
+process.on('uncaughtException', async (error) => {
   console.error('Uncaught Exception:', error);
-  // Optionally perform cleanup tasks
-  // For example: close database connections, release resources, etc.
-  // Exit the process with a non-zero exit code to indicate an error
-  await mongoose.disconnect()
-  console.log('Database connection restarted!')
-  await  mongoose.connect(CONNECTION_STRING,{
-    useUnifiedTopology:true,
-    useNewUrlParser:true
+  errorLogger.log('error',error.message)
+  setTimeout(()=>{process.exit(1)},750)
 });
-
-});*/
 start();
 
 async function start(){
@@ -80,6 +73,9 @@ async function start(){
       //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
       //WinstonLog.deleteMany({})
       //WinstonLogIapplyTransfer.deleteMany({}).then(()=>console.log('Requests deleted!'));
+      //await WinstonError.deleteMany({})
+      //const a=await WinstonError.find({})
+      //console.log(a)
     }
 }
 

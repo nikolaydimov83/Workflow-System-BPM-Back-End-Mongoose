@@ -1,5 +1,4 @@
 const { prepareMailContent, serverSendMail, emailAdress } = require('../emailClient/mail');
-
 const User = require('../models/User');
 const { getRequestById, editRequestStatus, getUserRights } = require('../services/requestServices');
 const { checkIfStatusIsClosed } = require('../services/statusServices');

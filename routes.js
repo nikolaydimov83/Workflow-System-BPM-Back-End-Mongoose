@@ -28,7 +28,7 @@ module.exports=(app)=>{
     app.use('/comments',commentsController);
     app.use('/search',searchController);
     app.use('/reportsController',reportsContoller);
-    app.use('/changeIApply',changeIapplyController);
+    //app.use('/changeIApply',changeIapplyController);
     app.use('/admin',adminUsersRightsControler);
     app.use('/workflow',workflowController);
     app.use('/wrongDataLogger',loggerController)

@@ -58,28 +58,10 @@ authController.post('/resetPass',async (req,res)=>{
     try {
         
         let user=await createResetPassToken(req.body.email);
-        /*const mailOptions = {
-            from: 'hello@example.com',
-            to: user.email,
-            subject: 'Subject',
-            text: user.resetToken
-            //html: `<a href="http://localhost:3002/users/resetPass/${user.resetToken}">Click here to set new password</a>`
-          };
-          
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                throw error
-            } else {
-                res.status(202);
-                res.json({message:'Email with token for password reset sent. Check your mail:' + user.email,_id:user._id});
-                console.log('Email sent: ' + info.response);
-              // do something useful
-            }
-          });*/
-    const messageForEmail='Use this token to reset your password: '+ user.resetToken
-    serverSendMail(emailAdress,user.email,'Reset token',messageForEmail)
-    res.status(201);
-    res.json(user)
+        const messageForEmail='Use this token to reset your password: '+ user.resetToken
+        serverSendMail(emailAdress,user.email,'Reset token',messageForEmail)
+        res.status(201);
+        res.json(user)
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)});
@@ -88,21 +70,6 @@ authController.post('/resetPass',async (req,res)=>{
 
     ;
 })
-
-/*authController.get('/resetPass/:token',async (req,res)=>{
-    try {
-        
-        console.log()
-
-
-    } catch (error) {
-        res.status(401);
-        res.json({message:parseError(error)});
-    }
-    
-
-    
-})*/
 
 authController.post('/resetPass/:id',async (req,res)=>{
     try {
