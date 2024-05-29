@@ -20,6 +20,7 @@ const loggerIapply = require('./logger/iapplyLogger');
 const Request = require('./models/Request');
 const WinstonLog = require('./models/WinstonLog');
 const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
+const { error } = require('console');
 
 
 const credentials = { 
@@ -59,7 +60,13 @@ async function start(){
     app.use(logRequest());
     app.use(cors(corsOptions));
     app.use(verifyToken());
+
     routesConfig(app);
+    app.use((err,req,res,next)=>{
+      res.status(500);
+      res.json({message:parseError(err)});
+      console.error(err.message);
+    });
     
     const server = https.createServer(credentials, app);
     server.listen(PORT, () => console.log(`Server listens on port ${IP_ADDRESS+":"+PORT}!`));
@@ -70,9 +77,9 @@ async function start(){
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
       let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
-      Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
+      //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
       //WinstonLog.deleteMany({})
-      WinstonLogIapplyTransfer.deleteMany({}).then(()=>console.log('Requests deleted!'));
+      //WinstonLogIapplyTransfer.deleteMany({}).then(()=>console.log('Requests deleted!'));
     }
 }
 

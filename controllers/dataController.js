@@ -8,6 +8,7 @@ const dataController=require('express').Router();
 dataController.get('/',async (req,res)=>{
     let user=req.user;
     const page=Number(req.query.page);
+    throw new Error('Test unhandled exception')
    try {
 
     let pendingList=await getAllUserPendingRequests(user,page)

@@ -18,7 +18,7 @@ const workflowController = require("./controllers/workflowController");
 
 module.exports=(app)=>{
 
-    try {
+  
     app.use('/users',authController);
     app.use('/data/catalog',dataController);
     app.use('/data/create',createController);
@@ -35,15 +35,5 @@ module.exports=(app)=>{
     app.use('/files', fileUploadsController);
     app.use('/history',historyController);
     app.use('*',unknownController);        
-    } catch (error) {
-        app.use((req,res,next)=>{
-            console.log('Uncaught error')
-            res.status=501
-            res.json(error)
-            next()
-        })
-    }
-
-    
 
 }
