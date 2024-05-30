@@ -23,6 +23,7 @@ const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
 const { error } = require('console');
 const errorLogger = require('./logger/errorLogger');
 const WinstonError = require('./models/WinstonError');
+const { parseError } = require('./utils/utils');
 
 
 const credentials = { 
