@@ -1,6 +1,6 @@
 const path = require('path');
 
-const CONNECTION_STRING='mongodb://localhost:27217,localhost:27218,localhost:27219/eurobankApp2?replicaSet=myReplicaSet1'
+const CONNECTION_STRING='mongodb://localhost:27217,localhost:27218,localhost:27219/eurobankApp2?replicaSet=myReplicaSet1';
 const PORT = 3030;
 const IP_ADDRESS="122.0.0.1";
 const FRONT_END_IP_ADDRESS="122.0.0.1:3000";

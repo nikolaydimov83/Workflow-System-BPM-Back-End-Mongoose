@@ -1,11 +1,11 @@
-const { prepareMailContent, serverSendMail, emailAdress } = require('../emailClient/mail');
+const { prepareMailContent, serverSendMail, emailAdress, emailSubjectForChangeRequestEdit } = require('../emailClient/mail');
+const { createMailList } = require('../emailClient/mailListCreators');
 const User = require('../models/User');
 const { getRequestById, getUserRights, changeRequestDeadline } = require('../services/requestServices');
 const { checkIfStatusIsClosed } = require('../services/statusServices');
 const { parseError } = require('../utils/utils');
 
 const editController=require('express').Router();
-const emailSubjectForChangeRequestEdit='PlanB Request Data Changed!'
 
 editController.put('/:id',async (req,res)=>{
     let requestId=req.params.id;
@@ -41,9 +41,7 @@ editController.put('/:id',async (req,res)=>{
         
 
         let emailContent=prepareMailContent(response)
-        let userListForEmail=await User.find({})
-            .or([{finCenter:response.finCenter},{finCenter:response.refferingFinCenter}])
-            .lean();
+        let userListForEmail=await createMailList(response,user)
             userListForEmail.forEach((user)=>{
 
                 serverSendMail(emailAdress,user.email,emailSubjectForChangeRequestEdit,emailContent)

@@ -7,24 +7,18 @@ const mongoose=require('mongoose');
 const verifyToken=require('./middlewares/jwt');
 const routesConfig=require('./routes');
 const corsOptions =require('./middlewares/cors');
-
 const Role = require('./models/Role');
 const { createRole } = require('./services/workflowServices');
 const { createUser } = require('./services/adminServices');
-const winstonExpress=require('express-winston');
-const logger = require('./logger/logger');
 const { filePathKey, filePathCert, CONNECTION_STRING, PORT, IP_ADDRESS } = require('./constants');
 const logRequest=require('./middlewares/loggerMiddleware');
 const { scheduleUploadIApplyData } = require('./scheduledTasks/shcheduleUploadIapplyData');
-const loggerIapply = require('./logger/iapplyLogger');
 const Request = require('./models/Request');
 const WinstonLog = require('./models/WinstonLog');
 const WinstonLogIapplyTransfer = require('./models/WinstonLogIApplyTransfers');
-const { error } = require('console');
 const errorLogger = require('./logger/errorLogger');
 const WinstonError = require('./models/WinstonError');
 const { parseError } = require('./utils/utils');
-
 
 const credentials = { 
   key: fs.readFileSync(filePathKey),

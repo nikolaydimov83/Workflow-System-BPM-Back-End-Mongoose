@@ -1,11 +1,12 @@
-const { prepareMailContent, serverSendMail, emailAdress } = require('../emailClient/mail');
+const { prepareMailContent, serverSendMail, emailAdress, emailSubjectForChangeStatus } = require('../emailClient/mail');
+const { createMailList } = require('../emailClient/mailListCreators');
 const User = require('../models/User');
 const { getRequestById, editRequestStatus, getUserRights } = require('../services/requestServices');
 const { checkIfStatusIsClosed } = require('../services/statusServices');
 const { parseError } = require('../utils/utils');
 
 const changeStatusController=require('express').Router();
-const emailSubjectForChangeStatus='PlanB Status Changed!'
+
 changeStatusController.post('/:id',async (req,res)=>{
     let requestId=req.params.id;
     let newStatusId=req.body.nextStatus;
@@ -24,20 +25,11 @@ changeStatusController.post('/:id',async (req,res)=>{
     
 
     let response=await editRequestStatus(requestId,newStatusId,user.email)
-
-    
-
     let emailContent=prepareMailContent(response)
-    let userListForEmail=await User.find({})
-        .or([{finCenter:response.finCenter},{finCenter:response.refferingFinCenter}])
-        .lean();
-        userListForEmail.forEach((user)=>{
-
-            serverSendMail(emailAdress,user.email,emailSubjectForChangeStatus,emailContent)
-        })
-    if(response.requestCreatorEmail!=user.email){
-        serverSendMail(emailAdress,response.requestCreatorEmail,emailSubjectForChangeStatus,emailContent)
-    }
+    let userListForEmail=await createMailList(response,user)
+    userListForEmail.forEach((user)=>{
+        serverSendMail(emailAdress,user.email,emailSubjectForChangeStatus,emailContent)
+    })
     res.status(201);    
     res.json(response);
    } catch (error) {

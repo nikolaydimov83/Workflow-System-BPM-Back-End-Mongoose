@@ -1,7 +1,10 @@
 const nodemailer=require('nodemailer');
 const { IP_ADDRESS, FRONT_END_IP_ADDRESS } = require('../constants');
-
+const emailSubjectForChangeStatus='PlanB Status Changed!'
+const emailSubjectForNewcomment='PlanB Comment Added!'
+const emailSubjectForChangeRequestEdit='PlanB Request Data Changed!'
 const emailAdress = 'planb_application@outlook.com'; // Your Outlook email address
+
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.office365.com', 
@@ -43,9 +46,9 @@ function prepareMailContent(request){
 
       }
     }
-
+/**/
   return `
-  <div><a href=http://${FRONT_END_IP_ADDRESS}/dashboard/${request._id}>Plan B заявка с id:  <a/>
+  <div><a href=https://${FRONT_END_IP_ADDRESS}/dashboard/${request._id}>Plan B заявка с id:  <a/>
   По апликация ${request.iApplyId} 
   На клиент ${request.clientName}, 
   ЕГФН:${request.clientEGFN} 
@@ -61,4 +64,4 @@ function prepareMailContent(request){
     text: 'Email content'
   };*/
   
-module.exports={serverSendMail,emailAdress,prepareMailContent};
+module.exports={serverSendMail,emailAdress,prepareMailContent,emailSubjectForChangeStatus,emailSubjectForNewcomment,emailSubjectForChangeRequestEdit};
