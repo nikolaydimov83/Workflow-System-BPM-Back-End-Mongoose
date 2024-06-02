@@ -26,7 +26,7 @@ const credentials = {
 }
 process.on('uncaughtException', async (error) => {
   console.error('Uncaught Exception:', error);
-  errorLogger.log('error',error.message)
+  errorLogger.log('error',error.message);
   setTimeout(()=>{process.exit(1)},750)
 });
 start();
