@@ -38,7 +38,7 @@ async function start(){
             useUnifiedTopology:true,
             useNewUrlParser:true
         });
-        console.log('Database connected')
+        console.log('Database connected');
     } catch (error) {
         console.error(error.message);
         process.exit(1)
@@ -61,9 +61,9 @@ async function start(){
 
     if (!(await Role.findOne({}))) {
       let adminRole = await createRole({ roleType: 'HO', roleName: 'Admin' });
-      let adminUser = await createUser({ email: 'rkostyaneva@postbank.bg', branchNumber: 101, branchName: 'Admin', userStatus: 'Active', role: adminRole.id });
+      let adminUser = await createUser({ email: 'admin@postbank.bg', branchNumber: 101, branchName: 'Admin', userStatus: 'Active', role: adminRole.id });
       let workflowRole = await createRole({ roleType: 'HO', roleName: 'Workflow' });
-      let workflowUser = await createUser({ email: 'ihristozova@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
+      let workflowUser = await createUser({ email: 'workflow@postbank.bg', branchNumber: 101, branchName: 'Workflow', userStatus: 'Active', role: workflowRole.id });
     }else{
       //Request.deleteMany({}).then(()=>console.log('Requests deleted!'))
       //WinstonLog.deleteMany({})
