@@ -23,7 +23,7 @@ adminUsersRightsControler.get('/',async(req,res)=>{
 adminUsersRightsControler.post('/',async(req,res)=>{
     try {
         if(await UserActiveDir.findOne({email:req.body.email})){
-            throw new Error('User already exists! If you want to change user data - go through edit functionality.')
+            throw new Error('User already exists! If you want to change user data - go through edit functionality.');
         }
         let user=await createUser(req.body);
         res.status(201);
