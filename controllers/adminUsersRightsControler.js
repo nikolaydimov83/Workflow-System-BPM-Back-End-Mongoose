@@ -54,7 +54,7 @@ adminUsersRightsControler.put('/:id',async(req,res)=>{
     try {
         await editUserById(id, req.body);
         res.status(201);
-        res.json(`User successffuly updated!`)
+        res.json(`User successffuly updated!`);
     } catch (error) {
         res.status(401);
         res.json({message:parseError(error)})
