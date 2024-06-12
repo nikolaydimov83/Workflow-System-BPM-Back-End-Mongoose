@@ -21,5 +21,5 @@ const errorLogger=winston.createLogger({
     
         
     )
-})
+});
 module.exports=errorLogger;
